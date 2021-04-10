@@ -1,0 +1,12 @@
+.input-group.input-group-solid.custom-date-icon {
+    .input-group-append {
+        position: absolute;
+        right: 0;
+        pointer-events: none;
+    }
+    .form-control.is-invalid {
+        background-position: right calc(3.375em + 0.325rem) center;
+        border-width: 1px;
+        border-style: solid;
+    }
+}

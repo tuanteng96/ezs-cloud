@@ -1,0 +1,281 @@
+/*------------------------------------*\
+    #FORMS
+\*------------------------------------*/
+
+
+/**
+ * 1) Form element base styles
+ */
+
+
+/**
+ * Input placeholder text base styles
+ */
+
+::-webkit-input-placeholder {
+    color: $color-gray-50;
+}
+
+::-moz-placeholder {
+    color: $color-gray-50;
+}
+
+:-ms-input-placeholder {
+    color: $color-gray-50;
+}
+
+
+/**
+ * Fieldset base styles
+ */
+
+fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+}
+
+
+/**
+ * Legend base styles
+ */
+
+legend {
+    margin-bottom: 0.25rem;
+}
+
+
+/**
+ * Label base styles
+ */
+
+label {
+    display: block;
+    padding-bottom: 0.25rem;
+    color: $color-gray-93;
+}
+
+
+/**
+ * Add font size 100% of form element and margin 0 to these elements
+ */
+
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: $font-size-med;
+    margin: 0;
+}
+
+
+/**
+ * Text area base styles
+ */
+
+textarea {
+    resize: none;
+}
+
+
+/**
+ * Input  and text area base styles
+ */
+
+input,
+textarea {
+    width: 100%;
+    border: $border-thickness solid $color-gray-73;
+    background: $color-white;
+    &:focus {
+        border-color: $color-gray-93;
+    }
+}
+
+
+/**
+ * Remove webkit appearance styles from these elements
+ */
+
+input[type=text],
+input[type=search],
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration,
+input[type=url],
+input[type=number],
+textarea {
+    -webkit-appearance: none;
+}
+
+
+/**
+ * Checkbox and radio button base styles
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    width: auto;
+    margin-right: 0.3rem;
+    border-color: $color-gray-73;
+}
+
+
+/**
+ * Search input base styles
+ */
+
+input[type="search"] {
+    -webkit-appearance: none;
+    border-radius: 0;
+}
+
+
+/**
+ * Select
+ * 1) Remove default styling
+ */
+
+select {
+    display: block;
+    font-size: $font-size-med;
+    width: 100%;
+    border: $border-thickness solid $color-gray-73;
+    padding: 0.5rem;
+    background: $color-white;
+    color: $color-gray-93;
+    &:focus {
+        border-color: $color-gray-93;
+    }
+}
+
+
+/**
+ * Select
+ * 2) Custom Select Material-UI
+ */
+
+div.form-control {
+    &.MuiInputBase-root {
+        width: 100%;
+        padding: 0;
+        line-height: initial;
+        letter-spacing: inherit;
+        font-family: $font-default;
+        .MuiSelect-select {
+            width: 100%;
+            height: calc(1.5em + 1.3rem + 2px);
+            padding: 0 18px;
+            line-height: calc(1.5em + 1.3rem + 2px);
+            letter-spacing: inherit;
+            box-sizing: border-box;
+        }
+        &::before,
+        &:after {
+            display: none;
+        }
+    }
+}
+
+.MuiButtonBase-root {
+    font-family: $font-default !important;
+    font-weight: 600 !important;
+    padding: 10px 16px !important;
+}
+
+
+/**
+ * Date
+ * 3) Custom Date  DatePicker
+ */
+
+.react-datepicker-wrapper {
+    width: 100%;
+}
+
+.react-datepicker-popper {
+    .react-datepicker {
+        font-family: $font-default;
+        min-width: 300px;
+        border: 0;
+        -webkit-box-shadow: 0 0 40px 0 rgba(82, 63, 105, 0.1);
+        box-shadow: 0 0 40px 0 rgba(82, 63, 105, 0.1);
+        border-radius: 0.42rem;
+        padding: 10px;
+        .react-datepicker__triangle {
+            display: none;
+        }
+        .react-datepicker__month-container {
+            float: none;
+            .react-datepicker__header {
+                background: transparent;
+                border: 0;
+                padding: 0;
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                .react-datepicker__day-name {
+                    font-size: 1rem;
+                    width: 39px;
+                    height: 35px;
+                    padding: 0;
+                    font-weight: 700;
+                    vertical-align: middle;
+                    text-align: center;
+                    border-radius: 0.42rem;
+                    margin: 0;
+                    color: #3F4254;
+                    border: 0;
+                    line-height: 20px;
+                    display: table-cell;
+                }
+            }
+            .react-datepicker__month {
+                margin: 0;
+                .react-datepicker__week {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    .react-datepicker__day {
+                        font-size: 1rem;
+                        width: 39px;
+                        height: 35px;
+                        padding: 0;
+                        vertical-align: middle;
+                        text-align: center;
+                        border-radius: 0.42rem;
+                        font-weight: 500;
+                        line-height: 35px;
+                        cursor: pointer;
+                        border: 0;
+                        margin: 0;
+                        color: #7E8299;
+                        &:hover {
+                            background: #F3F6F9;
+                        }
+                        &.react-datepicker__day--selected,
+                        &.react-datepicker__day--keyboard-selected {
+                            position: relative;
+                            background: #E1F0FF !important;
+                            color: #3699FF !important;
+                            font-weight: 700;
+                            &:before {
+                                content: "";
+                                display: inline-block;
+                                border: solid transparent;
+                                border-width: 0 0 7px 7px;
+                                border-bottom-color: #3699FF;
+                                border-top-color: #3699FF;
+                                position: absolute;
+                                bottom: 4px;
+                                right: 4px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
