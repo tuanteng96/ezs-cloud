@@ -8,7 +8,9 @@ const registrationSlice = createSlice({
         user: [],
         token: null,
         loadingBrand: false,
+        errorBrand: "",
         loadingFname: false,
+        errorUSN: "",
         registrationStatus: 'idle',
         registrationError: null,
         verifyStatus: 'idle',
@@ -21,10 +23,22 @@ const registrationSlice = createSlice({
                 loadingBrand: action.payload
             }
         },
+        setErrorBrand: (state, action) => {
+            return {
+                ...state,
+                errorBrand: action.payload
+            }
+        },
         setLoadingFName: (state, action) => {
             return {
                 ...state,
                 loadingFname: action.payload
+            }
+        },
+        setErrorUSN: (state, action) => {
+            return {
+                ...state,
+                errorUSN: action.payload
             }
         },
     },
@@ -61,5 +75,5 @@ const registrationSlice = createSlice({
     }
 });
 const { reducer: registrationReducer, actions } = registrationSlice;
-export const { setLoadingBrand, setLoadingFName } = actions;
+export const { setLoadingBrand, setErrorBrand, setLoadingFName, setErrorUSN } = actions;
 export default registrationReducer;

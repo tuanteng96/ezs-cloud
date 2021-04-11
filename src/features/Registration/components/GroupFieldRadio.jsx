@@ -39,7 +39,7 @@ function GroupFieldRadio(props) {
       {arrPackage &&
         arrPackage.map((item, index) => (
           <div className="col-lg-6" key={index}>
-            <div className={!showError && "form-group"}>
+            <div className={!showError ? "form-group" : "null"}>
               <label className="option cursor-pointer">
                 <span className="option-control">
                   <span className="radio">
@@ -63,7 +63,7 @@ function GroupFieldRadio(props) {
             </div>
           </div>
         ))}
-      <div className={`col-md-12 ${showError && "form-group"}`}>
+      <div className={`col-md-12 ${showError ? "form-group" : null}`}>
         {showError && (
           <div className="fv-plugins-message-container">
             <div className="fv-help-block">{errors[name]}</div>

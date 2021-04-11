@@ -45,20 +45,22 @@ function InputField(props) {
           </Link>
         )}
       </div>
-      <input
-        className={`form-control form-control-solid h-auto p-5 rounded-sm ${
-          showError && "error-solid"
-        }`}
-        type={type}
-        {...field}
-        autoComplete="off"
-        placeholder={placeholder}
-        autoComplete="off"
-      />
+      <div className="input-group input-group-solid">
+        <input
+          className={`form-control h-auto p-5 rounded-sm ${
+            showError && "error-solid is-invalid"
+          }`}
+          type={type}
+          {...field}
+          autoComplete="off"
+          placeholder={placeholder}
+          autoComplete="off"
+        />
+      </div>
       {showError && (
         <div className="fv-plugins-message-container">
           <div data-validator="notEmpty" className="fv-help-block">
-            <svg
+            {/* <svg
               aria-hidden="true"
               className="stUf5b qpSchb"
               fill="currentColor"
@@ -69,7 +71,7 @@ function InputField(props) {
               xmlns="https://www.w3.org/2000/svg"
             >
               <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
-            </svg>
+            </svg> */}
             {errors[name]}
           </div>
         </div>

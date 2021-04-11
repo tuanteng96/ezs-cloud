@@ -32,7 +32,7 @@ function FormLogin(props) {
       .required("Vui lòng nhập tài khoản của bạn."),
     Pwd: Yup.string()
       .required("Vui lòng nhập mật khẩu")
-      .min(4, "Mật khẩu quá ngắn - tối thiểu phải có 4 ký tự."),
+      .min(6, "Mật khẩu quá ngắn - tối thiểu phải có 6 ký tự."),
   });
   const dispatch = useDispatch();
   let history = useHistory();
@@ -202,7 +202,7 @@ function FormLogin(props) {
         const { values, errors, touched } = formikProps;
         //console.log({ values, errors, touched });
         return (
-          <Form className="form w-xxl-550px rounded-lg p-20 fv-plugins-bootstrap fv-plugins-framework">
+          <Form className="form w-xxl-550px rounded-lg p-20 fv-plugins-framework">
             {/*begin::Title*/}
             <div className="pb-13 pt-lg-0 pt-5">
               <h3 className="font-weight-700 text-dark font-size-h4 font-size-h1-lg">

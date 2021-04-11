@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
-import { setLoadingBrand } from "../registrationSlice";
+import { setLoadingBrand, setErrorBrand } from "../registrationSlice";
 import { useDispatch } from "react-redux";
 
 InputFieldLocation.propTypes = {
@@ -28,14 +28,16 @@ function InputFieldLocation(props) {
   const handleOnChange = async (evt) => {
     field.onChange(evt);
     await dispatch(setLoadingBrand(true));
+    await dispatch(setErrorBrand(null));
     handleLocation(evt, form, errors[name]);
   };
 
   return (
     <div className="form-group fv-plugins-icon-container has-success">
       {label && <label className="font-weight-700">{label}</label>}
+      <div className="input-group input-group-solid">
       <input
-        className={`form-control form-control-solid form-control-lg ${showError && "error-solid"
+        className={`form-control form-control-lg ${showError ? "is-invalid error-solid" : ""
           }`}
         type={type}
         {...field}
@@ -43,21 +45,10 @@ function InputFieldLocation(props) {
         placeholder={placeholder}
         onChange={handleOnChange}
       />
+      </div>
       {showError ? (
         <div className="fv-plugins-message-container">
           <div data-validator="notEmpty" className="fv-help-block">
-            <svg
-              aria-hidden="true"
-              className="stUf5b qpSchb"
-              fill="currentColor"
-              focusable="false"
-              width="16px"
-              height="16px"
-              viewBox="0 0 24 24"
-              xmlns="https://www.w3.org/2000/svg"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-            </svg>
             {errors[name]}
           </div>
         </div>

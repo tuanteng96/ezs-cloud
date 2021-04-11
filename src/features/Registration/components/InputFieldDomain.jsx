@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { existValidate } from "../asyncActions";
+import { setErrorBrand } from "../registrationSlice";
+import { _, debounce } from "lodash";
 
 InputFieldDomain.propTypes = {
   field: PropTypes.object.isRequired,
@@ -9,14 +13,12 @@ InputFieldDomain.propTypes = {
   type: PropTypes.string,
   desc: PropTypes.string,
   label: PropTypes.string,
-  handleBrandName: PropTypes.func,
 };
 InputFieldDomain.defaultProps = {
   placeholder: "",
   type: "text",
   desc: "",
   label: "",
-  handleBrandName: null,
 };
 
 function InputFieldDomain(props) {
@@ -27,38 +29,73 @@ function InputFieldDomain(props) {
     placeholder,
     desc,
     label,
-    handleBrandName,
   } = props;
+
+  const { loadingBrand, errorBrand } = useSelector((state) => state.userRegistration);
+  const dispatch = useDispatch();
+
   const { name } = field;
   const { errors, touched } = form;
-  const showError = errors[name] && touched[name];
-
-  const { loadingBrand } = useSelector(
-    (state) => state.userRegistration
-  );
+  const [time, setTime] = useState(null);
+  const [isLoading, setIsloading] = useState(false);
+  const showError = (errors[name] || errorBrand) && touched[name];
+  
   const handleOnChange = (evt) => {
+    const value = evt.target.value;
     field.onChange(evt);
-    handleBrandName(evt.target.value, form, errors[name]);
+    setIsloading(true);
+
+    if (errors[name] || value.length < 1) {
+      dispatch(setErrorBrand(null))
+      setIsloading(false);
+      return false;
+    }
+    const data = {
+      name: value,
+      type: "brand",
+    };
+
+    if (time) clearTimeout(time);
+    setTime(
+      setTimeout(async () => {
+        const result = await dispatch(existValidate(data));
+        const resultUn = unwrapResult(result);
+        if (resultUn) {
+          form.setFieldTouched("BrandLink", true, false);
+          form.setFieldError(
+            "BrandLink",
+            "Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."
+          );
+          setIsloading(false);
+          dispatch(setErrorBrand("Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."))
+        } else {
+          setIsloading(false);
+          dispatch(setErrorBrand(null))
+        }
+      }, 500)
+    );
   };
 
   return (
     <div className="form-group fv-plugins-icon-container has-success">
       {label && <label className="font-weight-700">{label}</label>}
       <div
-        className={`input-group ${!showError && "input-group-solid"} ${
-          loadingBrand && "spinner spinner-primary spinner-left"
-        }`}
+        className={`input-group ${!showError && "input-group-solid"}`}
       >
-        <input
-          className={`form-control form-control-solid form-control-lg ${
-            field.value && !showError && "is-valid"
-          } ${showError && "error-solid"}`}
-          type={type}
-          {...field}
-          autoComplete="off"
-          placeholder={placeholder}
-          onChange={handleOnChange}
-        />
+        <div className={`spinner-input-group ${
+          loadingBrand || isLoading ? "spinner spinner-primary spinner-right" : ""
+        }`}>
+          <input
+            className={`form-control form-control-lg ${
+              field.value && !isLoading && !loadingBrand && !showError ? "is-valid" : ""
+            } ${showError ? "error-solid is-invalid" : ""}`}
+            type={type}
+            {...field}
+            autoComplete="off"
+            placeholder={placeholder}
+            onChange={handleOnChange}
+          />
+        </div>
         <div className="input-group-append">
           <button
             className="btn btn-primary btn-lg font-weight-700"
@@ -71,19 +108,7 @@ function InputFieldDomain(props) {
       {showError ? (
         <div className="fv-plugins-message-container">
           <div data-validator="notEmpty" className="fv-help-block">
-            <svg
-              aria-hidden="true"
-              className="stUf5b qpSchb"
-              fill="currentColor"
-              focusable="false"
-              width="16px"
-              height="16px"
-              viewBox="0 0 24 24"
-              xmlns="https://www.w3.org/2000/svg"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-            </svg>
-            {errors[name]}
+            {errors[name] || errorBrand}
           </div>
         </div>
       ) : (

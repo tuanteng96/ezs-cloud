@@ -65625,6 +65625,11 @@ code {
     box-shadow: none;
 }
 
+.input-group.input-group-solid .form-control.error-solid {
+    border: 1px solid #F64E60 !important;
+    background-color: #ffffff;
+}
+
 .input-group.input-group-solid .form-control.form-control-solid:active,
 .input-group.input-group-solid .form-control.form-control-solid.active,
 .input-group.input-group-solid .form-control.form-control-solid:focus,

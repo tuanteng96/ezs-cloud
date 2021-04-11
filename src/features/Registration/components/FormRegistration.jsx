@@ -7,7 +7,6 @@ import {
   verify,
   getDomain,
   getSuggest,
-  existValidate,
 } from "../asyncActions";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { unwrapResult } from "@reduxjs/toolkit";
@@ -47,12 +46,12 @@ function FormRegistration(props) {
   };
 
   const validationSchema = Yup.object().shape({
-    FullName: Yup.string().required("Vui lòng nhập họ tên đầy đủ của bạn."),
+    FullName: Yup.string().required("Nhập họ tên đầy đủ của bạn."),
     USN: Yup.string()
       .required("Vui lòng nhập tên tài khoản.")
       .matches(
         usernameRegExp,
-        "Tên tài khoản phải có ít nhất 6 kí tự, nhiều nhất 20 kí tự & không có dấu."
+        "Tên tài khoản phải có ít nhất 4 kí tự, nhiều nhất 20 kí tự & không có dấu."
       ),
     RegPhone: Yup.string()
       .required("Vui lòng nhập số điện thoại của bạn.")
@@ -67,24 +66,7 @@ function FormRegistration(props) {
       .required("Vui lòng nhập đường dẫn quản trị của bạn.")
       .min(3, "Đường dẫn thương hiệu phải có ít nhất 3 kí tự.")
       .max(250, "Đường dẫn thương hiệu quá dài.")
-    //   .test(
-    //     debounce(async function (value) {
-    //       const data = {
-    //         name: value,
-    //         type: "brand",
-    //       };
-    //       const result = await dispatch(existValidate(data));
-    //       const resultUn = unwrapResult(result);
-    //       if (resultUn) {
-    //         return this.createError({
-    //           message: "Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác.",
-    //         });
-    //       } else {
-    //         return true;
-    //       }
-    //     }, 500)
-    // )
-    ,
+      ,
     PackageId: Yup.string().required("Vui lòng chọn gói đăng ký."),
     Pwd: Yup.string()
       .required("Vui lòng nhập mật khẩu.")
@@ -93,7 +75,7 @@ function FormRegistration(props) {
         "Mật khẩu phải chứa ít nhất 8 ký tự, một chữ hoa, một số và một ký tự đặc biệt."
       ),
     RePwd: Yup.string()
-      .required("Vui lòng xác nhận mật khẩu của bạn.")
+      .required("Xác nhận mật khẩu của bạn.")
       .oneOf([Yup.ref("Pwd"), null], "Mật khẩu không khớp."),
     agree: Yup.boolean().oneOf(
       [true],
@@ -104,9 +86,7 @@ function FormRegistration(props) {
   const dispatch = useDispatch();
   let history = useHistory();
 
-  const { registrationStatus } = useSelector(
-    (state) => state.userRegistration
-  );
+  const { registrationStatus } = useSelector((state) => state.userRegistration);
 
   const [loadingOTP, setLoadingOTP] = useState(false);
 
@@ -255,44 +235,6 @@ function FormRegistration(props) {
     debounceSuggestFullname(evt.target.value, form, error);
   };
 
-  const handleBrandUSN = debounce(async (value, form, error) => {
-    if (error || value.length < 1) {
-      return false;
-    }
-    const data = {
-      name: value,
-      type: "user",
-    };
-    const result = await dispatch(existValidate(data));
-    const resultUn = unwrapResult(result);
-    if (resultUn) {
-      form.setFieldTouched("USN", true, false);
-      form.setFieldError(
-        "USN",
-        "Tên tài khoản đã tồn tại. Vui lòng nhập tên tài khoản khác."
-      );
-    }
-  }, 500);
-
-  const handleBrandName = debounce(async (value, form, error) => {
-    if (error || value.length < 1) {
-      return false;
-    }
-    const data = {
-      name: value,
-      type: "brand",
-    };
-    const result = await dispatch(existValidate(data));
-    const resultUn = unwrapResult(result);
-    if (resultUn) {
-      form.setFieldTouched("BrandLink", true, false);
-      form.setFieldError(
-        "BrandLink",
-        "Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."
-      );
-    }
-  }, 500);
-
   return (
     <Formik
       initialValues={initialValues}
@@ -356,9 +298,6 @@ function FormRegistration(props) {
                 label="Đường quản trị của bạn"
                 type="text"
                 desc="Đường dẫn truy cập quản lý Spa của bạn."
-                handleBrandName={(value, form, error) =>
-                  handleBrandName(value, form, error)
-                }
               />
               <FastField
                 name="USN"
@@ -367,9 +306,6 @@ function FormRegistration(props) {
                 label="Tên tài khoản"
                 type="text"
                 desc="Sử dụng tài khoản này để đăng nhập hệ thống."
-                handleBrandUSN={(e, form, error) =>
-                  handleBrandUSN(e, form, error)
-                }
               />
               <div className="row">
                 <div className="col-xl-6">

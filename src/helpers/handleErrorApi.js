@@ -10,6 +10,10 @@ const SwitchLanguage = (text) => {
             return "Số điện thoại không đúng định dạng";
         case "The field LocationName must be a string with a minimum length of 3 and a maximum length of 250.":
             return "Tên thương hiệu phải có độ dài tối thiểu là 3 và độ dài tối đa là 250.";
+        case "TK_DA_SU_DUNG":
+            return "Tên tài khoản đã tồn tại. Vui lòng nhập tên tài khoản khác."
+        case "THUONG_HIEU_LINK_DA_TON_TAI":
+            return "Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."
         default:
             return text;
             break;

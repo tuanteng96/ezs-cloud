@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoadingFName } from "../registrationSlice";
+import { setErrorUSN } from "../registrationSlice";
+import { existValidate } from "../asyncActions";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 InputFieldUSN.propTypes = {
   field: PropTypes.object.isRequired,
@@ -11,7 +13,6 @@ InputFieldUSN.propTypes = {
   desc: PropTypes.string,
   label: PropTypes.string,
   disabled: PropTypes.string,
-  handleBrandUSN: PropTypes.func,
 };
 InputFieldUSN.defaultProps = {
   placeholder: "",
@@ -19,7 +20,6 @@ InputFieldUSN.defaultProps = {
   desc: "",
   label: "",
   disabled: "",
-  handleBrandUSN: null,
 };
 
 function InputFieldUSN(props) {
@@ -31,32 +31,70 @@ function InputFieldUSN(props) {
     desc,
     label,
     disabled,
-    handleBrandUSN,
   } = props;
-  const { name } = field;
-  const { errors, touched } = form;
-  const showError = errors[name] && touched[name];
 
   const dispatch = useDispatch();
-  const { loadingFname } = useSelector((state) => state.userRegistration);
+  const { loadingFname, errorUSN } = useSelector(
+    (state) => state.userRegistration
+  );
+  
+  const { name } = field;
+  const { errors, touched } = form;
+  const [time, setTime] = useState(null);
+  const [isLoading, setIsloading] = useState(false);
+  const showError = (errors[name] || errorUSN) && touched[name];
 
   const handleOnChange = (evt) => {
+    const value = evt.target.value;
     field.onChange(evt);
-    handleBrandUSN(evt.target.value, form, errors[name]);
+    setIsloading(true);
+
+    if (errors[name] || value.length < 1) {
+      dispatch(setErrorUSN(null))
+      setIsloading(false);
+      return false;
+    }
+
+    const data = {
+      name: value,
+      type: "user",
+    };
+
+    if (time) clearTimeout(time);
+    setTime(
+      setTimeout(async () => {
+        const result = await dispatch(existValidate(data));
+        const resultUn = unwrapResult(result);
+        if (resultUn) {
+          form.setFieldTouched("USN", true, false);
+          form.setFieldError(
+            "USN",
+            "Tên tài khoản đã tồn tại. Vui lòng nhập tên tài khoản khác."
+          );
+          setIsloading(false);
+          dispatch(setErrorUSN("Tên tài khoản đã tồn tại. Vui lòng nhập tên tài khoản khác."))
+        } else {
+          setIsloading(false);
+          dispatch(setErrorUSN(null))
+        }
+      }, 500)
+    );
+
+    //handleBrandUSN(evt.target.value, form, errors[name]);
   };
 
   return (
     <div className="form-group fv-plugins-icon-container has-success">
       {label && <label className="font-weight-700">{label}</label>}
       <div
-        className={`input-group-solid ${
-          loadingFname && "spinner spinner-primary spinner-left"
+        className={`input-group input-group-solid ${
+          loadingFname || isLoading ? "spinner spinner-primary spinner-right" : ""
         }`}
       >
         <input
-          className={`form-control form-control-solid form-control-lg ${
-            field.value && !showError && "is-valid"
-          } ${showError && "error-solid"}`}
+          className={`form-control form-control-lg ${
+            field.value && !isLoading && !loadingFname && !showError ? "is-valid" : ""
+          } ${showError ? "error-solid is-invalid" : ""}`}
           type={type}
           {...field}
           autoComplete="off"
@@ -68,19 +106,7 @@ function InputFieldUSN(props) {
       {showError ? (
         <div className="fv-plugins-message-container">
           <div data-validator="notEmpty" className="fv-help-block">
-            <svg
-              aria-hidden="true"
-              className="stUf5b qpSchb"
-              fill="currentColor"
-              focusable="false"
-              width="16px"
-              height="16px"
-              viewBox="0 0 24 24"
-              xmlns="https://www.w3.org/2000/svg"
-            >
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-            </svg>
-            {errors[name]}
+          {errors[name] || errorUSN}
           </div>
         </div>
       ) : (
