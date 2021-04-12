@@ -12,7 +12,7 @@ const Dashboard = (props) => {
   useEffect(() => {
     async function fetchMyAPI() {
       const values = {
-        Name: "nguyentuandz",
+        Name: "tuanteng",
         Pwd: "abc@123456A",
       };
       const resultAction = await dispatch(login(values));

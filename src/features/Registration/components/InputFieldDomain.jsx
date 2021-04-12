@@ -22,16 +22,11 @@ InputFieldDomain.defaultProps = {
 };
 
 function InputFieldDomain(props) {
-  const {
-    field,
-    form,
-    type,
-    placeholder,
-    desc,
-    label,
-  } = props;
+  const { field, form, type, placeholder, desc, label } = props;
 
-  const { loadingBrand, errorBrand } = useSelector((state) => state.userRegistration);
+  const { loadingBrand, errorBrand } = useSelector(
+    (state) => state.userRegistration
+  );
   const dispatch = useDispatch();
 
   const { name } = field;
@@ -39,19 +34,19 @@ function InputFieldDomain(props) {
   const [time, setTime] = useState(null);
   const [isLoading, setIsloading] = useState(false);
   const showError = (errors[name] || errorBrand) && touched[name];
-  
+
   const handleOnChange = (evt) => {
     const value = evt.target.value;
     field.onChange(evt);
     setIsloading(true);
 
-    if (errors[name] || value.length < 1) {
-      dispatch(setErrorBrand(null))
-      setIsloading(false);
-      return false;
-    }
+    // if (errors[name] || value.length < 1) {
+    //   dispatch(setErrorBrand(null))
+    //   setIsloading(false);
+    //   return false;
+    // }
     const data = {
-      name: value,
+      name: value + ".ezs.vn",
       type: "brand",
     };
 
@@ -67,10 +62,12 @@ function InputFieldDomain(props) {
             "Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."
           );
           setIsloading(false);
-          dispatch(setErrorBrand("Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."))
+          dispatch(
+            setErrorBrand("Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác.")
+          );
         } else {
           setIsloading(false);
-          dispatch(setErrorBrand(null))
+          dispatch(setErrorBrand(null));
         }
       }, 500)
     );
@@ -79,15 +76,19 @@ function InputFieldDomain(props) {
   return (
     <div className="form-group fv-plugins-icon-container has-success">
       {label && <label className="font-weight-700">{label}</label>}
-      <div
-        className={`input-group ${!showError && "input-group-solid"}`}
-      >
-        <div className={`spinner-input-group ${
-          loadingBrand || isLoading ? "spinner spinner-primary spinner-right" : ""
-        }`}>
+      <div className={`input-group ${!showError && "input-group-solid"}`}>
+        <div
+          className={`spinner-input-group ${
+            loadingBrand || isLoading
+              ? "spinner spinner-primary spinner-right"
+              : ""
+          }`}
+        >
           <input
             className={`form-control form-control-lg ${
-              field.value && !isLoading && !loadingBrand && !showError ? "is-valid" : ""
+              field.value && !isLoading && !loadingBrand && !showError
+                ? "is-valid"
+                : ""
             } ${showError ? "error-solid is-invalid" : ""}`}
             type={type}
             {...field}

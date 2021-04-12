@@ -49,11 +49,11 @@ function InputFieldUSN(props) {
     field.onChange(evt);
     setIsloading(true);
 
-    if (errors[name] || value.length < 1) {
-      dispatch(setErrorUSN(null))
-      setIsloading(false);
-      return false;
-    }
+    // if (errors[name] || value.length < 1) {
+    //   dispatch(setErrorUSN(null))
+    //   setIsloading(false);
+    //   return false;
+    // }
 
     const data = {
       name: value,

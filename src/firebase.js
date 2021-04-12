@@ -1,13 +1,13 @@
 import firebase from 'firebase';
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBO7t9bPzpm1dCLX8xeNLdMcM29Jn5s51Y",
-    authDomain: "ezs-cloud.firebaseapp.com",
-    projectId: "ezs-cloud",
-    storageBucket: "ezs-cloud.appspot.com",
-    messagingSenderId: "327738980740",
-    appId: "1:327738980740:web:b551b92624a8936903c5d1",
-    measurementId: "G-VC1VFP0PY4"
+    apiKey: "AIzaSyABHqqhid5jQEXuXuZJ18wy_CUaYRLl1q0",
+    authDomain: "ezs-cloud-262d4.firebaseapp.com",
+    projectId: "ezs-cloud-262d4",
+    storageBucket: "ezs-cloud-262d4.appspot.com",
+    messagingSenderId: "341015307628",
+    appId: "1:341015307628:web:a0ce7947f8450ddff63f49",
+    measurementId: "G-SCQ93TDNZM"
 };
 firebase.initializeApp(firebaseConfig);
 export default firebase;
