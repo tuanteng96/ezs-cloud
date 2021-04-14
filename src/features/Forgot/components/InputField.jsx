@@ -28,7 +28,7 @@ function InputField(props) {
         type={type}
         {...field}
         className={`form-control form-control-solid form-control-lg ${
-          showError && "is-invalid"
+          showError && "is-invalid error-solid is-invalid"
         }`}
         placeholder={placeholder}
       />

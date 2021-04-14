@@ -4,6 +4,7 @@ import { FastField, Form, Formik } from "formik";
 import * as Yup from "yup";
 import InputField from "./InputField";
 import { phoneRegExp } from "../../../helpers/RegExp";
+import { useSelector } from "react-redux";
 
 FormPhone.propTypes = {
   onSubmit: PropTypes.func,
@@ -14,7 +15,7 @@ FormPhone.defaultProps = {
 
 function FormPhone(props) {
   const initialValues = {
-    Phone: null,
+    Phone: "",
   };
   const validationSchema = Yup.object().shape({
     Phone: Yup.string()
@@ -22,6 +23,10 @@ function FormPhone(props) {
       .matches(phoneRegExp, "Số điện thoại không hợp lệ.")
       .nullable(),
   });
+
+  const { loadingPhone, sendOTP } = useSelector((state) => state.userForgot);
+
+
   return (
     <Formik
       initialValues={initialValues}
@@ -58,11 +63,20 @@ function FormPhone(props) {
                   <button
                     type="submit"
                     id="next-step"
-                    className="btn btn-primary font-weight-bolder font-size-h6 py-4 my-3 mr-3 px-8"
+                    className={`btn btn-primary font-weight-bolder font-size-h6 py-4 my-3 px-8 ${
+                      loadingPhone
+                        ? "spinner spinner-white spinner-right disabled"
+                        : ""
+                    }`}
                     data-wizard-type="action-next"
                   >
-                    Tiếp theo
-                    <span className="svg-icon svg-icon-md ml-3">
+                    {!sendOTP ? "Tiếp theo" : "Đang gửi OTP ..."}
+                    
+                    <span
+                      className={`svg-icon svg-icon-md ml-3 mr-5 ${
+                        loadingPhone ? "mr-5" : ""
+                      }`}
+                    >
                       {/*begin::Svg Icon | path:assets/media/svg/icons/Navigation/Arrow-right.svg*/}
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

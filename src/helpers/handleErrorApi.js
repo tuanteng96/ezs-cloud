@@ -14,9 +14,10 @@ const SwitchLanguage = (text) => {
             return "Tên tài khoản đã tồn tại. Vui lòng nhập tên tài khoản khác."
         case "THUONG_HIEU_LINK_DA_TON_TAI":
             return "Đường dẫn đã tồn tại. Vui lòng nhập đường dẫn khác."
+        case "SDT_CHUA_DUOC_DK":
+            return "Số điện thoại không tồn lại."
         default:
             return text;
-            break;
     }
 }
 

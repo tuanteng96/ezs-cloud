@@ -2,18 +2,11 @@ import { FastField, Form, Formik } from "formik";
 import React, { useCallback, useState } from "react";
 import GoogleLoginAuth from "../../../components/GoogleLoginAuth";
 import * as Yup from "yup";
-import {
-  registration,
-  verify,
-  getDomain,
-  getSuggest,
-} from "../asyncActions";
+import { registration, verify, getDomain, getSuggest } from "../asyncActions";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import firebase from "../../../firebase";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import InputField from "./InputField";
 import InputFieldCheckbox from "./InputFieldCheckbox";
@@ -31,6 +24,7 @@ import GroupFieldRadio from "./GroupFieldRadio";
 import { _, debounce } from "lodash";
 import { setLoadingBrand, setLoadingFName } from "../registrationSlice";
 import InputFieldUSN from "./InputFieldUSN";
+import userApi from "../../../api/userApi";
 
 function FormRegistration(props) {
   const initialValues = {
@@ -65,8 +59,7 @@ function FormRegistration(props) {
     BrandLink: Yup.string()
       .required("Vui lòng nhập đường dẫn quản trị của bạn.")
       .min(3, "Đường dẫn thương hiệu phải có ít nhất 3 kí tự.")
-      .max(250, "Đường dẫn thương hiệu quá dài.")
-      ,
+      .max(250, "Đường dẫn thương hiệu quá dài."),
     PackageId: Yup.string().required("Vui lòng chọn gói đăng ký."),
     Pwd: Yup.string()
       .required("Vui lòng nhập mật khẩu.")
@@ -87,7 +80,6 @@ function FormRegistration(props) {
   let history = useHistory();
 
   const { registrationStatus } = useSelector((state) => state.userRegistration);
-
   const [loadingOTP, setLoadingOTP] = useState(false);
 
   const handleSubmit = async (values, { setErrors, resetForm }) => {
@@ -96,86 +88,69 @@ function FormRegistration(props) {
       { ...values, BrandLink: values.BrandLink + ".ezs.vn" }
     );
 
-    const userLogin = {
-      Name: values.USN,
-      Pwd: values.Pwd,
-    };
-
     dataRegistration.RegPhone = formatPhone84(dataRegistration.RegPhone);
 
     try {
       const resultAction = await dispatch(registration(dataRegistration));
       const resultData = unwrapResult(resultAction);
-      const phoneNumber = `+${resultData.user.RegPhone}`;
+
       setLoadingOTP(true);
-      window.appVerifier = new firebase.auth.RecaptchaVerifier(
-        "recaptcha-container",
-        {
-          size: "invisible",
-        }
-      );
-      firebase
-        .auth()
-        .signInWithPhoneNumber(phoneNumber, window.appVerifier)
-        .then(async function (e) {
-          setLoadingOTP(false);
-          const { value: VerifyCode } = await Swal.fire({
-            title: "Nhập mã OTP gửi về số điện thoại của bạn",
-            input: "text",
-            inputAttributes: {
-              autocapitalize: "off",
-            },
-            inputValidator: (code) => {
-              return new Promise((resolve) => {
-                if (code === "") {
-                  resolve("Vui lòng nhập mã OTP gửi về số điện thoại của bạn.");
-                } else {
-                  e.confirm(code)
-                    .then(function (result) {
-                      resolve();
-                    })
-                    .catch((error) => {
-                      resolve("Mã OTP không chính xác.");
-                    });
-                }
-              });
-            },
-            showCancelButton: true,
-            confirmButtonText: "Xác nhận",
-            showLoaderOnConfirm: true,
-          });
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setLoadingOTP(false);
 
-          if (VerifyCode) {
-            try {
-              const infoVerify = {
-                UserID: resultData.user.Id,
-                Secure: resultData.user.Verified.Key,
-              };
-              const resultVerifyAction = await dispatch(verify(infoVerify));
-              const resultLoginAction = await dispatch(getDomain(userLogin));
-              const resultLoginData = unwrapResult(resultLoginAction);
+      Swal.fire({
+        title: "Nhập mã OTP gửi về số điện thoại",
+        input: "text",
+        inputAttributes: {
+          autocapitalize: "off",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Xác thực",
+        showLoaderOnConfirm: true,
+        preConfirm: async (code) => {
+          try {
+            const resultVerify = await dispatch(
+              verify({ UserID: resultData.user.Id, Secure: code })
+            );
+            const resultVerifyUn = unwrapResult(resultVerify);
+            const resultLoginAction = await dispatch(
+              getDomain({
+                Name: values.USN,
+                Pwd: values.Pwd,
+              })
+            );
+            const resultLoginData = unwrapResult(resultLoginAction);
 
-              const hrefBrand = resultLoginData.user.Brands[0].Link;
-              Swal.fire({
-                title: "Đăng ký thành công.",
-                icon: "success",
-                html: `Đăng kí tài khoản thành công. Vui lòng truy cập <a class="text-danger" href="https://${hrefBrand}/login"><b>https://${hrefBrand}</b></a> để bắt đầu quản lý phần mềm.`,
-                showCancelButton: true,
-                confirmButtonText: `Quản lý phần mềm`,
-                cancelButtonText: `Đóng`,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href = `https://${hrefBrand}/login`;
-                } else {
-                  resetForm();
-                }
-              });
-            } catch (errors) {
-              console.log(errors);
-              setErrors(handelErrorApi(errors.errors));
-            }
+            console.log(resultLoginAction);
+
+            return new Promise((resolve, reject) => {
+              resolve(resultLoginData);
+            })
+            
+          } catch (error) {
+            Swal.showValidationMessage(`Mã xác nhận không hợp lệ.`);
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      }).then(async (result) => {
+        const resultLoginData = result.value;
+        const hrefBrand = resultLoginData.UserInfo.Brands[0].Link;
+
+        Swal.fire({
+          title: "Đăng ký thành công.",
+          icon: "success",
+          html: `Đăng kí tài khoản thành công. Vui lòng truy cập <a class="text-danger" href="https://${hrefBrand}/login"><b>https://${hrefBrand}</b></a> để bắt đầu quản lý phần mềm.`,
+          showCancelButton: true,
+          confirmButtonText: `Quản lý phần mềm`,
+          cancelButtonText: `Đóng`,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = `https://${hrefBrand}/login`;
+          } else {
+            resetForm();
           }
         });
+      });
     } catch (errors) {
       console.log(errors);
       setErrors(handelErrorApi(errors.errors));

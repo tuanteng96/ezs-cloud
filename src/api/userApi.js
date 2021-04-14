@@ -7,13 +7,22 @@ class userApi {
     registration(user) {
         return axiosClient.post(`/api/v1/signup`, JSON.stringify(user));
     }
+    requireVerifyPhone(phone) {
+        return axiosClient.get(`/api/v1/user/requireVerifyPhone?Phone=${phone}`);
+    }
+    verifyPhoneForgot(data) {
+        return axiosClient.get(`/api/v1/user/verifyPhone?Phone=${data.Phone}&secure=${data.secure}`);
+    }
+    findUsersByPhone(data) {
+        return axiosClient.post(`/api/v1/user/find-users-by-phone`, JSON.stringify(data));
+    }
     getSuggest(data) {
         return axiosClient.post(`/api/v1/user/suggest?name=${data.name}&type=${data.type}`);
     }
     exist(data) {
         return axiosClient.post(`/api/v1/user/exist?name=${data.name}&type=${data.type}`);
     }
-    verifyPhone(infoVerify) {
+    verifyPhoneUSN(infoVerify) {
         return axiosClient.get(`/api/v1/user/verify?UserID=${infoVerify.UserID}&Secure=${infoVerify.Secure}`)
     }
     reVerify(UserId) {

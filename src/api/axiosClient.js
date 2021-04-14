@@ -15,6 +15,7 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(async(config) => {
     // Handle token here ...
     const token = await getToken();
+
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -28,9 +29,21 @@ axiosClient.interceptors.request.use(async(config) => {
 // Response interceptor for API calls
 axiosClient.interceptors.response.use((response) => {
 
+    // const { status, auto } = response.data;
+    // //const token = await getToken();
+
+    // if (status === 401) {
+    //     if (auto === 'yes') {
+    //         const config = response.config;
+    //         //config.headers.Authorization = `Bearer ${token}`;
+    //         return response.data;
+    //     }
+    // }
+
     if (response && response.data) {
         return response.data;
     }
+
     return response;
 }, (error) => {
     // Check Error Token

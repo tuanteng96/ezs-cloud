@@ -57,7 +57,6 @@ const registrationSlice = createSlice({
             state.user = {
                 Id: user.Id,
                 RegPhone: user.RegPhone,
-                Secure: user.Verified.Secure
             };
         },
         [verify.pending]: (state) => {

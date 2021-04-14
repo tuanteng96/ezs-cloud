@@ -13,7 +13,7 @@ function GoogleLoginAuth(props) {
   let history = useHistory();
   const responseGoogle = (response) => {
     const token = response.tokenId;
-    console.log(token);
+    // console.log(token);
     // setToken(token);
     // history.push("/dashboard");
   };

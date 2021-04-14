@@ -3,12 +3,16 @@ import PropTypes from "prop-types";
 import { Form, Formik } from "formik";
 import * as Yup from "yup";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 
 FormUpdatePwd.propTypes = {
   onSubmit: PropTypes.func,
 };
 
 function FormUpdatePwd(props) {
+
+  const { dataUser } = useSelector((state) => state.userForgot);
+  console.log(dataUser);
   const initialValues = {};
   //const validationSchema = Yup.object().shape({});
   return (
@@ -27,6 +31,37 @@ function FormUpdatePwd(props) {
             Cập nhập mật khẩu mới
           </h2>
           {/*::Input*/}
+
+          <div className="fv-plugins-icon-container">
+            <div className="row">
+              {dataUser &&
+                dataUser.map((item, index) => (
+                  <div className="col-lg-6" key={index}>
+                    <label className="option form-group">
+                      <span className="option-control">
+                        <span className="radio">
+                          <input
+                            type="radio"
+                            name="m_option_1"
+                          />
+                          <span />
+                        </span>
+                      </span>
+                      <span className="option-label">
+                        <span className="option-head">
+                          <span className="option-title font-weight-700">{item.USN}</span>
+                        </span>
+                        <span className="option-body">
+                          {item.Brands[0].Title} <br />
+                          {item.Brands[0].Link}
+                        </span>
+                      </span>
+                    </label>
+                  </div>
+                ))}
+            </div>
+          </div>
+
           <div className="form-group fv-plugins-icon-container">
             <label>Mật khẩu mới</label>
             <input

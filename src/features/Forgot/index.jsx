@@ -1,9 +1,15 @@
+import { unwrapResult } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Link, Redirect } from "react-router-dom";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import { handelErrorApi } from "../../helpers/handleErrorApi";
 import { getToken } from "../../helpers/localStorageUser";
+import { findUsersByPhone, requireVerifyPhone, verifyPhone } from "./asyncActions";
 import FormPhone from "./components/FormPhone";
 import FormUpdatePwd from "./components/FormUpdatePwd";
 import "./css/style.scss";
+import { setLoadingPhone, setSendOTP, setdataUser } from "./forgotSlice";
 // import PropTypes from 'prop-types';
 
 // Forgot.propTypes = {};
@@ -13,7 +19,8 @@ const isLogin = () => {
 };
 
 function Forgot(props) {
-  const [isChangePwd, setIsChangePwd] = useState(false);
+  const [isChangePwd, setIsChangePwd] = useState(true);
+  const dispath = useDispatch();
 
   useEffect(() => {
     const elementsOverlay = document.getElementsByClassName(
@@ -26,8 +33,59 @@ function Forgot(props) {
     return <Redirect to="/" />;
   }
 
-  const handleSubmit = (values, { setErrors, resetForm }) => {
-    console.log(values);
+  const handleSubmit = async (values, { setErrors, resetForm }) => {
+    const phone = `84${values.Phone}`;
+    try {
+      await dispath(setLoadingPhone(true));
+      const resultRequire = await dispath(requireVerifyPhone(phone));
+      unwrapResult(resultRequire);
+      await dispath(setSendOTP(true));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await dispath(setSendOTP(false));
+      Swal.fire({
+        title: "Nhập mã OTP gửi về số điện thoại",
+        input: "text",
+        inputPlaceholder: "Nhập mã xác thực",
+        inputAttributes: {
+          autocapitalize: "off",
+        },
+        showCancelButton: true,
+        confirmButtonText: "Xác nhận",
+        cancelButtonText: "Hủy",
+        showLoaderOnConfirm: true,
+        preConfirm: async (code) => {
+          try {
+            const resultPhone = await dispath(
+              verifyPhone({
+                Phone: phone,
+                secure: code,
+              })
+            );
+            const resultPhoneUn = unwrapResult(resultPhone);
+            const resultListUser = await dispath(
+              findUsersByPhone({
+                Phone: phone,
+                PhoneSecure: resultPhoneUn.phoneSecure,
+              })
+            );
+            const resultListUserUn = unwrapResult(resultListUser);
+            await dispath(setdataUser(resultListUserUn));
+            await dispath(setLoadingPhone(false));
+            setIsChangePwd(true);
+          } catch (error) {
+            Swal.showValidationMessage(`Mã xác nhận không hợp lệ.`);
+          }
+        },
+        allowOutsideClick: () => !Swal.isLoading(),
+      }).then((result) => {
+        dispath(setLoadingPhone(false));
+        dispath(setSendOTP(false));
+      });
+
+    } catch (errors) {
+      await dispath(setLoadingPhone(false));
+      setErrors(handelErrorApi(errors.errors));
+    }
   };
 
   return (

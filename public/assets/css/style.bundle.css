@@ -65463,7 +65463,7 @@ code {
 
 .form-control.form-control-solid.error-solid {
     border: 1px solid #d93025;
-    background: #ffff;
+    background-color: #ffff;
 }
 
 .form-control.form-control-solid::-moz-placeholder {

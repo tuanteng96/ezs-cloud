@@ -12,7 +12,7 @@ export const registration = createAsyncThunk('/user/registration', async(user, {
 
 export const verify = createAsyncThunk('/user/verify', async(infoVerify, { rejectWithValue }) => {
     try {
-        const data = await userApi.verifyPhone(infoVerify);
+        const data = await userApi.verifyPhoneUSN(infoVerify);
         return data;
     } catch (error) {
         return rejectWithValue(error.response.data)
@@ -22,7 +22,7 @@ export const verify = createAsyncThunk('/user/verify', async(infoVerify, { rejec
 export const getDomain = createAsyncThunk('/user/getdomain', async(user, { rejectWithValue }) => {
     try {
         const result = await userApi.login(user);
-        return result.data;
+        return result;
     } catch (error) {
         return rejectWithValue(error.response.data)
     }
