@@ -4,21 +4,22 @@ const forgotSlice = createSlice({
     name: 'forgot',
     initialState: {
         loadingPhone: false,
+        loadingResetPwd: false,
         sendOTP: false,
-        dataUser: [{
-                USN: "nguyentaituan",
-                Brands: [
-                    { Link: "tuantengspa.ezs.vn", Title: "Tuấn teng Spa & Beauty" }
-                ]
-            },
-            { USN: "tuanteng", Brands: [{ Link: "tuanezs.ezs.vn", Title: "Tuấn EZS" }] },
-        ]
+        dataUser: [],
+        phoneSecure: "",
     },
     reducers: {
         setLoadingPhone: (state, action) => {
             return {
                 ...state,
                 loadingPhone: action.payload
+            }
+        },
+        setLoadingResetPwd: (state, action) => {
+            return {
+                ...state,
+                loadingResetPwd: action.payload
             }
         },
         setSendOTP: (state, action) => {
@@ -32,6 +33,12 @@ const forgotSlice = createSlice({
                 ...state,
                 dataUser: action.payload
             }
+        },
+        setPhoneSecure: (state, action) => {
+            return {
+                ...state,
+                phoneSecure: action.payload
+            }
         }
     },
     extraReducers: {
@@ -39,5 +46,5 @@ const forgotSlice = createSlice({
     }
 });
 const { reducer: forgotReducer, actions } = forgotSlice;
-export const { setLoadingPhone, setSendOTP, setdataUser } = actions;
+export const { setLoadingPhone, setLoadingResetPwd, setSendOTP, setdataUser, setPhoneSecure } = actions;
 export default forgotReducer;

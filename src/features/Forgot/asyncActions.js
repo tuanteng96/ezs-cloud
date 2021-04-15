@@ -27,3 +27,12 @@ export const findUsersByPhone = createAsyncThunk('/user/find-users-by-phone', as
         return rejectWithValue(error.response.data);
     }
 });
+
+export const resetForgot = createAsyncThunk('/user/reset-forgot', async(data, { rejectWithValue }) => {
+    try {
+        const result = await userApi.resetforgot(data);
+        return result;
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+});

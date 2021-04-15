@@ -8,7 +8,7 @@ InputFieldCheckbox.propTypes = {
 };
 
 InputFieldCheckbox.defaultProps = {
-  type: "text",
+  type: "checkbox",
 };
 
 function InputFieldCheckbox(props) {

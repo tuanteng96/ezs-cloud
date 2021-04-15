@@ -3274,7 +3274,7 @@ textarea.form-control.is-invalid {
     box-shadow: none;
 }
 
-a.btn.disabled,
+.btn.disabled,
 fieldset:disabled a.btn {
     pointer-events: none;
 }

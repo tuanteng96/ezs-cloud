@@ -1,17 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 import { Redirect, Link, useHistory } from "react-router-dom";
-// import PropTypes from 'prop-types';
 import { getToken } from "../../helpers/localStorageUser";
 import FormLogin from "./components/FormLogin";
+import Swal from "sweetalert2";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./css/style.scss";
-
-// Login.propTypes = {};
+import { login, requireVerifyPhone, verifyPhone } from "./asyncActions";
+import { unwrapResult } from "@reduxjs/toolkit";
+import { setLoadingOTP } from "./loginSlice";
 
 const isLogin = () => {
   return getToken() ? true : false;
 };
 
 function Login(props) {
+
+  const dispatch = useDispatch();
+  let history = useHistory();
 
   useEffect(() => {
     const elementsOverlay = document.getElementsByClassName(
@@ -23,6 +30,112 @@ function Login(props) {
   if (isLogin()) {
     return <Redirect to="/" />;
   }
+
+  const handleLogin = async (values, { setErrors, resetForm }) => {
+    try {
+      const resultAction = await dispatch(login(values));
+      const resultData = unwrapResult(resultAction);
+      const Link = resultData.UserInfo.UI.Links[0].Link;
+      history.push(Link);
+    } catch (error) {
+      console.log(unauthenAccount(error && error));
+      if (unauthenAccount(error && error)) {
+        const Phone = unauthenAccount(error && error.errors);
+
+        Swal.fire({
+          title: "Yêu cầu xác thực tài khoản.",
+          html: `Tài khoản của bạn chưa được xác thực. Vui lòng thực hiện <b class="text-danger">Lấy mã xác thực</b> để tiếp tục đăng nhập.`,
+          icon: "warning",
+          confirmButtonText: "Lấy mã xác thực",
+          showLoaderOnConfirm: true,
+          preConfirm: async () => {
+            await dispatch(setLoadingOTP(true));
+            const resultRequi = await dispatch(requireVerifyPhone(Phone));
+            const resultRequiUn = unwrapResult(resultRequi);
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await dispatch(setLoadingOTP(false));
+            const { value: loginLink } = await Swal.fire({
+              title: "Nhập mã OTP gửi về số điện thoại",
+              input: "text",
+              inputAttributes: {
+                autocapitalize: "off",
+              },
+              inputPlaceholder: "Mã xác thực",
+              showDenyButton: true,
+              denyButtonColor: "#848484",
+              denyButtonText: "Mã xác thực mới",
+              confirmButtonText: "Xác thực",
+              showLoaderOnConfirm: true,
+              showLoaderOnDeny: true,
+              allowOutsideClick: false,
+              preConfirm: async (code) => {
+                if (!code) {
+                  Swal.showValidationMessage(`Mã xác thực không hợp lệ.`);
+                  return;
+                }
+                try {
+                  const verifiPhone = await dispatch(
+                    verifyPhone({ Phone: Phone, secure: code })
+                  );
+                  const verifiPhoneUn = unwrapResult(verifiPhone);
+                  await new Promise((resolve) => setTimeout(resolve, 500));
+                  const resultAction = await dispatch(login(values));
+                  const resultData = unwrapResult(resultAction);
+                  const Link = resultData.UserInfo.UI.Links[0].Link;
+                  return new Promise((resolve, reject) => {
+                    resolve(Link);
+                  });
+                } catch (error) {
+                  Swal.showValidationMessage(`Mã xác thực không hợp lệ.`);
+                }
+              },
+              preDeny: async () => {
+                try {
+                  const resultResetRequi = await dispatch(
+                    requireVerifyPhone(Phone)
+                  );
+                  const resultResetRequiUn = unwrapResult(resultResetRequi);
+                  await new Promise((resolve) => setTimeout(resolve, 500));
+                  toast.success("Gửi mã OTP mới thành công !", {
+                    position: toast.POSITION.TOP_CENTER,
+                    autoClose: 2000,
+                  });
+                } catch (error) {
+                  Swal.showValidationMessage(
+                    `Lấy mã mới nhận mới không thành công.`
+                  );
+                }
+                return false;
+              },
+            });
+
+            if (loginLink) {
+              console.log(loginLink);
+            }
+          },
+          allowOutsideClick: false,
+        }).then(async (result) => {
+          resetForm();
+        });
+      } else {
+        console.log(error);
+        Swal.fire({
+          icon: "error",
+          title: "Xảy ra lỗi.",
+          text: "Tài khoản hoặc mật khẩu không chính xác",
+        });
+      }
+    }
+  };
+
+  const unauthenAccount = (error) => {
+    if (error.errors && error.errors && error.errors.USN[0] === "TK_CHUA_XAC_THUC") {
+      return error.appendData.UserId;
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div className="d-flex flex-column flex-root">
       {/*begin::Login*/}
@@ -62,7 +175,7 @@ function Login(props) {
               {/*begin::Signin*/}
               <div className="login-form login-signin">
                 {/*begin::Form*/}
-                <FormLogin />
+                <FormLogin onSubmit={handleLogin} />
                 {/*end::Form*/}
               </div>
               {/*end::Signin*/}
@@ -70,8 +183,7 @@ function Login(props) {
             <div
               className="col-lg-6 bgi-size-contain bgi-no-repeat bgi-position-y-center bgi-position-x-center min-h-150px mt-10 m-md-0"
               style={{
-                backgroundImage:
-                  `url(${process.env.PUBLIC_URL}/assets/media/svg/illustrations/accomplishment.svg)`,
+                backgroundImage: `url(${process.env.PUBLIC_URL}/assets/media/svg/illustrations/accomplishment.svg)`,
               }}
             />
           </div>
@@ -106,6 +218,7 @@ function Login(props) {
         {/*end::Footer*/}
       </div>
       {/*end::Login*/}
+      <ToastContainer />
     </div>
   );
 }

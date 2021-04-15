@@ -7,6 +7,9 @@ class userApi {
     registration(user) {
         return axiosClient.post(`/api/v1/signup`, JSON.stringify(user));
     }
+    resetforgot(data) {
+        return axiosClient.post(`/api/v1/user/resetpwd`, JSON.stringify(data));
+    }
     requireVerifyPhone(phone) {
         return axiosClient.get(`/api/v1/user/requireVerifyPhone?Phone=${phone}`);
     }
@@ -26,10 +29,10 @@ class userApi {
         return axiosClient.get(`/api/v1/user/verify?UserID=${infoVerify.UserID}&Secure=${infoVerify.Secure}`)
     }
     reVerify(UserId) {
-        return axiosClient.get(`/api/v1/user/re-verify?UserID=${UserId}`)
+        return axiosClient.get(`/api/v1/user/re-verify?UserID=${UserId}`);
     }
     getPackage() {
-        return axiosClient.get(`/api/v1/user/packages`)
+        return axiosClient.get(`/api/v1/user/packages`);
     }
 }
 

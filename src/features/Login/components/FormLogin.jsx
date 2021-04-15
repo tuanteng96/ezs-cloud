@@ -1,25 +1,21 @@
 import { FastField, Form, Formik } from "formik";
-import React, { useState } from "react";
+import React from "react";
 import GoogleLoginAuth from "../../../components/GoogleLoginAuth";
 import InputField from "./InputField";
 import * as Yup from "yup";
-import { login, reVerify } from "../asyncActions";
-import { unwrapResult } from "@reduxjs/toolkit";
-import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { handelErrorApi } from "../../../helpers/handleErrorApi";
-import Swal from "sweetalert2";
-import firebase from "../../../firebase";
-import { verify } from "../../Registration/asyncActions";
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
+import { useSelector } from "react-redux";
 
-// FormLogin.propTypes = {
-
-// };
+FormLogin.propTypes = {
+  onSubmit: PropTypes.func,
+};
+FormLogin.defaultProps = {
+  onSubmit: null,
+};
 
 function FormLogin(props) {
+
+  const { onSubmit } = props;
   const initialValues = {
     Name: "",
     Pwd: "",
@@ -34,169 +30,14 @@ function FormLogin(props) {
       .required("Vui lòng nhập mật khẩu")
       .min(6, "Mật khẩu quá ngắn - tối thiểu phải có 6 ký tự."),
   });
-  const dispatch = useDispatch();
-  let history = useHistory();
 
-  const [loadingOTP, setLoadingOTP] = useState(false);
-  const { loginStatus } = useSelector((state) => state.userLogin);
-
-  const handleSubmit = async (values, { setErrors, resetForm }) => {
-    
-    try {
-      const resultAction = await dispatch(login(values));
-      const resultData = unwrapResult(resultAction);
-      const phoneNumber = `+${resultData.user.RegPhone}`;
-      const UserId = resultData.user.Id;
-      const isVerified = resultData.user.Verified.Success;
-
-      if (isVerified) {
-        toast.success("Đăng nhập thành công !", {
-          position: toast.POSITION.TOP_RIGHT,
-          autoClose: 1000,
-        });
-        setTimeout(() => {
-          history.push("/dashboard");
-        }, 1000);
-      }
-      else {
-        Swal.fire({
-          title: "Yêu cầu xác thực tài khoản ?",
-          html: `Tài khoản của bạn chưa được xác thực. Vui lòng thực hiện <b class="text-danger">Lấy mã xác thực<b> để tiếp tục đăng nhập.`,
-          icon: "warning",
-          //showCancelButton: true,
-          // confirmButtonColor: "#3085d6",
-          // cancelButtonColor: "#d33",
-          confirmButtonText: "Lấy mã xác thực",
-        }).then(async (result) => {
-          if (result.isConfirmed) {
-            setLoadingOTP(true);
-            try {
-              const resultVerifyAction = await dispatch(reVerify(UserId));
-              const resultVerifyData = unwrapResult(resultVerifyAction);
-              const Secure = resultVerifyData.Secure;
-
-              window.appVerifier = new firebase.auth.RecaptchaVerifier(
-                "recaptcha-container",
-                {
-                  size: "invisible",
-                  callback: function (response) {
-                    // reCAPTCHA solved - will proceed with submit function
-                  },
-                  "expired-callback": function () {
-                    // Reset reCAPTCHA?
-                  },
-                }
-              );
-              firebase
-                .auth()
-                .signInWithPhoneNumber(phoneNumber, window.appVerifier)
-                .then(async function (e) {
-                  setLoadingOTP(false);
-                  const { value: VerifyCode } = await Swal.fire({
-                    title: "Nhập mã OTP gửi về số điện thoại của bạn",
-                    input: "text",
-                    inputAttributes: {
-                      autocapitalize: "off",
-                    },
-                    inputValidator: (code) => {
-                      return new Promise((resolve) => {
-                        if (code === "") {
-                          resolve(
-                            "Vui lòng nhập mã OTP gửi về số điện thoại của bạn."
-                          );
-                        } else {
-                          e.confirm(code)
-                            .then(function (result) {
-                              resolve();
-                            })
-                            .catch((error) => {
-                              resolve("Mã OTP không chính xác.");
-                            });
-                        }
-                      });
-                    },
-                    showCancelButton: true,
-                    confirmButtonText: "Xác nhận",
-                    showLoaderOnConfirm: true,
-                  });
-
-                  if (VerifyCode) {
-                    try {
-                      const infoVerify = {
-                        UserID: UserId,
-                        Secure: Secure,
-                      };
-                      const resultVerifyAction = await dispatch(
-                        verify(infoVerify)
-                      );
-
-                      Swal.fire({
-                        title: "Xác thực thành công.",
-                        icon: "success",
-                        html: `Tài khoản của bạn đã được xác thực.Chọn <b class="text-danger" >tiếp tục</b> để bắt đầu quản lý phần mềm.`,
-                        showCancelButton: true,
-                        confirmButtonText: `Tiếp tục`,
-                        cancelButtonText: `Đóng`,
-                      }).then(async (result) => {
-                        if (result.isConfirmed) {
-                          try {
-                            const resultLoginAction = await dispatch(
-                              login(values)
-                            );
-                            const resultLoginData = unwrapResult(
-                              resultLoginAction
-                            );
-                            toast.success("Đăng nhập thành công !", {
-                              position: toast.POSITION.TOP_RIGHT,
-                              autoClose: 1000,
-                            });
-                            setTimeout(() => {
-                              history.push("/dashboard");
-                            }, 500);
-                          }
-                          catch (errors) {
-                            setErrors(handelErrorApi(errors.errors));
-                          }
-                        } else {
-                          resetForm();
-                        }
-                      });
-
-                    } catch (errors) {
-                      setErrors(handelErrorApi(errors.errors));
-                    }
-                  }
-                });
-            } catch (errors) {
-              setLoadingOTP(false);
-              Swal.fire({
-                icon: "error",
-                title: "Xảy ra lỗi.",
-                text: errors.message,
-              });
-              console.log(errors);
-            }
-          }
-        });
-      }
-      
-      //history.push("/dashboard");
-      //dispatch(setUser());
-    } catch (errors) {
-      Swal.fire({
-        icon: "error",
-        title: "Xảy ra lỗi.",
-        text: "Tài khoản hoặc mật khẩu không chính xác",
-      });
-    }
-
-  };
+  const { loginStatus, loadingOTP } = useSelector((state) => state.userLogin);
 
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
     >
       {(formikProps) => {
         const { values, errors, touched } = formikProps;
@@ -240,7 +81,7 @@ function FormLogin(props) {
                     : "px-8"
                 }`}
               >
-                {loadingOTP === true ? "Đang gửi OTP" : "Đăng nhập"}
+                {loadingOTP === true ? "Đang gửi OTP ..." : "Đăng nhập"}
               </button>
               <GoogleLoginAuth />
             </div>

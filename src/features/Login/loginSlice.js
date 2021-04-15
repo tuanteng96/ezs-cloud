@@ -9,12 +9,20 @@ const initialToken = getToken();
 const loginSlice = createSlice({
     name: 'login',
     initialState: {
-        user: initialUser,
+        userInfo: initialUser,
         token: initialToken,
         loginStatus: 'idle',
-        loginError: null
+        loginError: null,
+        loadingOTP: false,
     },
-    reducers: {},
+    reducers: {
+        setLoadingOTP: (state, action) => {
+            return {
+                ...state,
+                loadingOTP: action.payload
+            }
+        }
+    },
     extraReducers: {
         [login.pending]: (state) => {
             state.loginStatus = "loading";
@@ -23,19 +31,22 @@ const loginSlice = createSlice({
             state.loginStatus = "failed";
             state.loginError = action.error.message;
         },
-        [login.fulfilled]: (state, action) => {
+        [login.fulfilled]: (state, { payload }) => {
             state.loginStatus = "success";
-            state.token = action.payload.token;
-            state.user = action.payload.user;
-            const isVerified = action.payload.user.Verified.Success;
+            const { UserInfo } = payload;
+            const token = UserInfo.Token;
 
-            if (isVerified) {
-                setToken(action.payload.token);
-                setUserStorage(action.payload.user);
-            }
+            setUserStorage(UserInfo);
+            setToken(token);
+
+            return void({
+                ...state,
+                userInfo: UserInfo,
+                token: token
+            })
         },
     }
 });
 const { reducer: loginReducer, actions } = loginSlice;
-export const { setUser } = actions;
+export const { setLoadingOTP } = actions;
 export default loginReducer;

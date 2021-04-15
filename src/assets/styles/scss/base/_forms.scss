@@ -279,3 +279,18 @@ div.form-control {
         }
     }
 }
+
+
+/**
+ * 
+ * 4) Catch Error 
+ */
+
+.fv-plugins-message-container {
+    .fv-help-block {
+        &.fv-help-custom {
+            font-size: 0.9rem;
+            font-weight: 400;
+        }
+    }
+}

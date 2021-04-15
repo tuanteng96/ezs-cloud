@@ -2,14 +2,26 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Link, Redirect } from "react-router-dom";
+import { useHistory } from "react-router-dom/cjs/react-router-dom.min";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { handelErrorApi } from "../../helpers/handleErrorApi";
 import { getToken } from "../../helpers/localStorageUser";
-import { findUsersByPhone, requireVerifyPhone, verifyPhone } from "./asyncActions";
+import {
+  findUsersByPhone,
+  requireVerifyPhone,
+  resetForgot,
+  verifyPhone,
+} from "./asyncActions";
 import FormPhone from "./components/FormPhone";
 import FormUpdatePwd from "./components/FormUpdatePwd";
 import "./css/style.scss";
-import { setLoadingPhone, setSendOTP, setdataUser } from "./forgotSlice";
+import {
+  setLoadingPhone,
+  setSendOTP,
+  setdataUser,
+  setPhoneSecure,
+  setLoadingResetPwd,
+} from "./forgotSlice";
 // import PropTypes from 'prop-types';
 
 // Forgot.propTypes = {};
@@ -19,8 +31,9 @@ const isLogin = () => {
 };
 
 function Forgot(props) {
-  const [isChangePwd, setIsChangePwd] = useState(true);
+  const [isChangePwd, setIsChangePwd] = useState(false);
   const dispath = useDispatch();
+  const history = useHistory();
 
   useEffect(() => {
     const elementsOverlay = document.getElementsByClassName(
@@ -62,6 +75,9 @@ function Forgot(props) {
               })
             );
             const resultPhoneUn = unwrapResult(resultPhone);
+
+            await dispath(setPhoneSecure(resultPhoneUn.phoneSecure));
+
             const resultListUser = await dispath(
               findUsersByPhone({
                 Phone: phone,
@@ -69,6 +85,7 @@ function Forgot(props) {
               })
             );
             const resultListUserUn = unwrapResult(resultListUser);
+
             await dispath(setdataUser(resultListUserUn));
             await dispath(setLoadingPhone(false));
             setIsChangePwd(true);
@@ -81,9 +98,41 @@ function Forgot(props) {
         dispath(setLoadingPhone(false));
         dispath(setSendOTP(false));
       });
-
     } catch (errors) {
       await dispath(setLoadingPhone(false));
+      setErrors(handelErrorApi(errors.errors));
+    }
+  };
+
+
+  const handleResetPwd = async (values, { setErrors, resetForm }) => {
+    try {
+      await dispath(setLoadingResetPwd(true));
+      const result = await dispath(resetForgot(values));
+      const resultUn = unwrapResult(result);
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await dispath(setLoadingResetPwd(false));
+      Swal.fire({
+        title: "Thay đổi thành công !",
+        text: "Mật khẩu của bạn đã được thay đổi thành công.",
+        icon: "success",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        cancelButtonText:"Tiếp tục",
+        confirmButtonText: "Đăng nhập tài khoản",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          history.push("/login");
+        }
+        else {
+          setIsChangePwd(false);
+        }
+      });
+
+    } catch (errors) {
+      console.log(errors);
+      await dispath(setLoadingResetPwd(false));
       setErrors(handelErrorApi(errors.errors));
     }
   };
@@ -210,7 +259,9 @@ function Forgot(props) {
                         {!isChangePwd && <FormPhone onSubmit={handleSubmit} />}
                         {/*end: Wizard Step 1*/}
                         {/*begin: Wizard Step 2*/}
-                        {isChangePwd && <FormUpdatePwd />}
+                        {isChangePwd && (
+                          <FormUpdatePwd onSubmit={handleResetPwd} />
+                        )}
                         {/*end: Wizard Step 2*/}
                         {/*end: Wizard Form*/}
                       </div>

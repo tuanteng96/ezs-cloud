@@ -104,6 +104,7 @@ function FormRegistration(props) {
         inputAttributes: {
           autocapitalize: "off",
         },
+        inputPlaceholder: "Mã xác thực",
         showCancelButton: true,
         confirmButtonText: "Xác thực",
         showLoaderOnConfirm: true,
@@ -121,17 +122,14 @@ function FormRegistration(props) {
             );
             const resultLoginData = unwrapResult(resultLoginAction);
 
-            console.log(resultLoginAction);
-
             return new Promise((resolve, reject) => {
               resolve(resultLoginData);
-            })
-            
+            });
           } catch (error) {
             Swal.showValidationMessage(`Mã xác nhận không hợp lệ.`);
           }
         },
-        allowOutsideClick: () => !Swal.isLoading(),
+        allowOutsideClick: false,
       }).then(async (result) => {
         const resultLoginData = result.value;
         const hrefBrand = resultLoginData.UserInfo.Brands[0].Link;
