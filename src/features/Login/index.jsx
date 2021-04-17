@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./css/style.scss";
-import { login, requireVerifyPhone, verifyPhone } from "./asyncActions";
+import { login, requireVerifyPhone, reVerify, verify } from "./asyncActions";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { setLoadingOTP } from "./loginSlice";
 
@@ -38,9 +38,9 @@ function Login(props) {
       const Link = resultData.UserInfo.UI.Links[0].Link;
       history.push(Link);
     } catch (error) {
-      console.log(unauthenAccount(error && error));
+      
       if (unauthenAccount(error && error)) {
-        const Phone = unauthenAccount(error && error.errors);
+        const {UserId} = unauthenAccount(error && error);
 
         Swal.fire({
           title: "Yêu cầu xác thực tài khoản.",
@@ -50,8 +50,8 @@ function Login(props) {
           showLoaderOnConfirm: true,
           preConfirm: async () => {
             await dispatch(setLoadingOTP(true));
-            const resultRequi = await dispatch(requireVerifyPhone(Phone));
-            const resultRequiUn = unwrapResult(resultRequi);
+            const resultReVerify = await dispatch(reVerify(UserId));
+            const resultReVerifyUn = unwrapResult(resultReVerify);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             await dispatch(setLoadingOTP(false));
             const { value: loginLink } = await Swal.fire({
@@ -74,13 +74,14 @@ function Login(props) {
                   return;
                 }
                 try {
-                  const verifiPhone = await dispatch(
-                    verifyPhone({ Phone: Phone, secure: code })
+                  const verifyUser = await dispatch(
+                    verify({ UserID: UserId, Secure: code })
                   );
-                  const verifiPhoneUn = unwrapResult(verifiPhone);
+                  const verifyUserUn = unwrapResult(verifyUser);
                   await new Promise((resolve) => setTimeout(resolve, 500));
                   const resultAction = await dispatch(login(values));
                   const resultData = unwrapResult(resultAction);
+                  
                   const Link = resultData.UserInfo.UI.Links[0].Link;
                   return new Promise((resolve, reject) => {
                     resolve(Link);
@@ -91,10 +92,10 @@ function Login(props) {
               },
               preDeny: async () => {
                 try {
-                  const resultResetRequi = await dispatch(
-                    requireVerifyPhone(Phone)
+                  const resultResetreVerify = await dispatch(reVerify(UserId));
+                  const resultResetreVerifyUn = unwrapResult(
+                    resultResetreVerify
                   );
-                  const resultResetRequiUn = unwrapResult(resultResetRequi);
                   await new Promise((resolve) => setTimeout(resolve, 500));
                   toast.success("Gửi mã OTP mới thành công !", {
                     position: toast.POSITION.TOP_CENTER,
@@ -110,7 +111,7 @@ function Login(props) {
             });
 
             if (loginLink) {
-              console.log(loginLink);
+              history.push(loginLink);
             }
           },
           allowOutsideClick: false,
@@ -118,7 +119,6 @@ function Login(props) {
           resetForm();
         });
       } else {
-        console.log(error);
         Swal.fire({
           icon: "error",
           title: "Xảy ra lỗi.",
@@ -129,8 +129,11 @@ function Login(props) {
   };
 
   const unauthenAccount = (error) => {
+    
     if (error.errors && error.errors && error.errors.USN[0] === "TK_CHUA_XAC_THUC") {
-      return error.appendData.UserId;
+      return {
+        UserId: error.appendData.UserId
+      };
     } else {
       return null;
     }

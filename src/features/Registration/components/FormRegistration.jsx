@@ -2,7 +2,7 @@ import { FastField, Form, Formik } from "formik";
 import React, { useCallback, useState } from "react";
 import GoogleLoginAuth from "../../../components/GoogleLoginAuth";
 import * as Yup from "yup";
-import { registration, verify, getDomain, getSuggest } from "../asyncActions";
+import { registration, verify, getDomain, getSuggest, reVerify } from "../asyncActions";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,7 +24,7 @@ import GroupFieldRadio from "./GroupFieldRadio";
 import { _, debounce } from "lodash";
 import { setLoadingBrand, setLoadingFName } from "../registrationSlice";
 import InputFieldUSN from "./InputFieldUSN";
-import userApi from "../../../api/userApi";
+import { toast, ToastContainer } from "react-toastify";
 
 function FormRegistration(props) {
   const initialValues = {
@@ -105,9 +105,13 @@ function FormRegistration(props) {
           autocapitalize: "off",
         },
         inputPlaceholder: "Mã xác thực",
-        showCancelButton: true,
+        showDenyButton: true,
+        denyButtonColor: "#848484",
+        denyButtonText: "Mã xác thực mới",
         confirmButtonText: "Xác thực",
         showLoaderOnConfirm: true,
+        showLoaderOnDeny: true,
+        allowOutsideClick: false,
         preConfirm: async (code) => {
           try {
             const resultVerify = await dispatch(
@@ -129,7 +133,22 @@ function FormRegistration(props) {
             Swal.showValidationMessage(`Mã xác nhận không hợp lệ.`);
           }
         },
-        allowOutsideClick: false,
+        preDeny: async () => {
+          try {
+            const resultResetreVerify = await dispatch(
+              reVerify(resultData.user.Id)
+            );
+            const resultResetreVerifyUn = unwrapResult(resultResetreVerify);
+            await new Promise((resolve) => setTimeout(resolve, 500));
+            toast.success("Gửi mã OTP mới thành công !", {
+              position: toast.POSITION.TOP_CENTER,
+              autoClose: 2000,
+            });
+          } catch (error) {
+            Swal.showValidationMessage(`Lấy mã mới nhận mới không thành công.`);
+          }
+          return false;
+        },
       }).then(async (result) => {
         const resultLoginData = result.value;
         const hrefBrand = resultLoginData.UserInfo.Brands[0].Link;
@@ -327,7 +346,7 @@ function FormRegistration(props) {
                 </button>
                 <GoogleLoginAuth />
               </div>
-              <div id="recaptcha-container"></div>
+              <ToastContainer />
             </div>
           </Form>
         );

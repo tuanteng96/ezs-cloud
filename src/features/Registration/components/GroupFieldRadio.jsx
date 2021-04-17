@@ -50,9 +50,7 @@ function GroupFieldRadio(props) {
                 <span className="option-label">
                   <span className="option-head flex-column">
                     <span className="option-title">{item.Title}</span>
-                    <span className="option-focus text-primary">
-                      Miễn phí dùng thử
-                    </span>
+                    <span className="option-focus text-primary">{item.Name}</span>
                   </span>
                   <span className="option-body">
                     Estimated 14-20 Day Shipping (Duties and taxes may be due

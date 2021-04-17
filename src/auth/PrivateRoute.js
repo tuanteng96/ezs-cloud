@@ -1,14 +1,17 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import { getToken } from "../helpers/localStorageUser";
+import { getToken, getUser } from "../helpers/localStorageUser";
 
 const PrivateRoute = ({ component: Component, path, ...rest }) => {
-    const useRouter = ["/dashboard", "/builder"];
+    const UI = getUser();
+    const useRouter = UI && UI.UI && UI.UI.Links.map((item) => item.Link);
     const isToken = getToken() ? true : false; //getToken() ? true : false;
+
     const checkRouter = (path) => {
         const isRouter = useRouter.indexOf(path);
         return isRouter !== -1 ? true : false;
     };
+
     return ( <
         Route {...rest }
         render = {

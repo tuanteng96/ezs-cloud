@@ -25,11 +25,11 @@ export const requireVerifyPhone = createAsyncThunk('/user/requireVerifyPhone', a
         return rejectWithValue(error.response.data);
     }
 });
-export const verifyPhone = createAsyncThunk('/user/verifyPhone', async(data, { rejectWithValue }) => {
+export const verify = createAsyncThunk('/user/verify', async(infoVerify, { rejectWithValue }) => {
     try {
-        const result = await userApi.verifyPhoneForgot(data);
-        return result;
+        const data = await userApi.verifyPhoneUSN(infoVerify);
+        return data;
     } catch (error) {
-        return rejectWithValue(error.response.data);
+        return rejectWithValue(error.response.data)
     }
 });

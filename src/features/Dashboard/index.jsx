@@ -9,18 +9,18 @@ import { login } from "../Login/asyncActions";
 const Dashboard = (props) => {
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    async function fetchMyAPI() {
-      const values = {
-        Name: "tuanteng",
-        Pwd: "abc@123456A",
-      };
-      const resultAction = await dispatch(login(values));
-      const resultData = unwrapResult(resultAction);
-      console.log(resultData);
-    }
-    fetchMyAPI();
-  },[])
+  // useEffect(() => {
+  //   async function fetchMyAPI() {
+  //     const values = {
+  //       Name: "tuanteng",
+  //       Pwd: "abc@123456A",
+  //     };
+  //     const resultAction = await dispatch(login(values));
+  //     const resultData = unwrapResult(resultAction);
+  //     console.log(resultData);
+  //   }
+  //   fetchMyAPI();
+  // },[])
 
   return (
     <MainLayout>

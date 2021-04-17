@@ -54,7 +54,6 @@ function InputField(props) {
           {...field}
           autoComplete="off"
           placeholder={placeholder}
-          autoComplete="off"
         />
       </div>
       {showError && (

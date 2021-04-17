@@ -7,7 +7,7 @@ NotFound.propTypes = {};
 
 function NotFound() {
   return (
-    <div className="page-notfound" style={{ backgroundImage: "url(assets/media/error/bg3.jpg)" }}>
+    <div className="page-notfound" style={{ backgroundImage: "url(/assets/media/error/bg3.jpg)" }}>
       <div className="d-flex flex-column flex-root">
         {/*begin::Error*/}
         <div className="d-flex flex-column-fluid align-items-first justify-content-center">
