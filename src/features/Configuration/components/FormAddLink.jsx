@@ -7,37 +7,32 @@ import FieldInput from "./FieldInput";
 import FieldSwitch from "./FieldSwitch";
 import { useSelector } from "react-redux";
 
-FormAddPackage.propTypes = {
-  onAddPackage: PropTypes.func.isRequired,
+FormAddLink.propTypes = {
+  onAddLink: PropTypes.func.isRequired,
   onHide: PropTypes.func.isRequired,
 };
-FormAddPackage.defaultProps = {
-  onAddPackage: null,
+FormAddLink.defaultProps = {
+  onAddLink: null,
   onHide: null,
 };
 
-function FormAddPackage(props) {
-  const { onAddPackage, onHide } = props;
+function FormAddLink(props) {
+  const { onAddLink, onHide } = props;
   const initialValues = {
-    Name: "",
-    Price: "",
-    IsPublic: true,
+    Title: "",
+    Link: "",
   };
   const validationSchema = Yup.object().shape({
-    Name: Yup.string()
-      .min(3, "Tài gói quá ngắn - tối thiểu phải có 3 ký tự.")
-      .max(50, "Tài gói quá dài - nhiều nhất 50 ký tự.")
-      .required("Vui lòng nhập tên gói."),
-    Price: Yup.string().required("Vui lòng nhập tiền nguyên giá.").nullable(),
-    IsPublic: Yup.bool().required("Vui lòng chọn trạng thái"),
+    Title: Yup.string().required("Vui lòng nhập tên Link."),
+    Link: Yup.string().required("Vui lòng nhập đường dẫn Link."),
   });
 
-  const { addPackageLoading } = useSelector((state) => state.userPackage);
+  const { addLinkLoading } = useSelector((state) => state.userConfiguration);
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={onAddPackage}
+      onSubmit={onAddLink}
     >
       {(formikProps) => {
         const { values, errors, touched } = formikProps;
@@ -50,51 +45,44 @@ function FormAddPackage(props) {
                   className="modal-title font-weight-800"
                   id="exampleModalLabel"
                 >
-                  Tạo gói mới
+                  Tạo Link mới
                 </h5>
                 <button
                   type="button"
                   className="close"
                   data-dismiss="modal"
                   aria-label="Close"
+                  onClick={onHide}
                 >
                   <i aria-hidden="true" className="ki ki-close" />
                 </button>
               </div>
               <div
                 className={`modal-body ${
-                  addPackageLoading === "loading" ? "overlay overlay-block" : ""
+                  addLinkLoading === "loading" ? "overlay overlay-block" : ""
                 }`}
               >
                 {/* overlay overlay-block */}
-                <div className="overlay-wrapper">
+                <div className="overlay-wrapper form-group-child">
                   <FastField
-                    name="Name"
+                    name="Title"
                     component={FieldInput}
-                    placeholder="Nhập tên gói"
-                    label="Tên gói"
-                    desc="Tên hiển thị gói"
+                    placeholder="Nhập tên Link"
+                    label="Tên Link"
+                    desc="Tên hiển thị Link"
                     type="text"
                   />
 
                   <FastField
-                    name="Price"
-                    component={FieldInputPrice}
-                    placeholder="Nhập nguyên giá"
-                    label="Nguyên giá"
-                    desc="Số tiền nguyên giá"
-                    type="number"
-                    defaultValue={true}
-                  />
-
-                  <FastField
-                    name="IsPublic"
-                    component={FieldSwitch}
-                    label="Trạng thái"
-                    type="checkbox"
+                    name="Link"
+                    component={FieldInput}
+                    placeholder="Nhập đường dẫn Link"
+                    label="Đường dẫn Link"
+                    desc="Đường dẫn hiển thị Link"
+                    type="text"
                   />
                 </div>
-                {addPackageLoading === "loading" ? (
+                {addLinkLoading === "loading" ? (
                   <div className="overlay-layer bg-dark-o-10">
                     <div className="spinner spinner-primary"></div>
                   </div>
@@ -113,7 +101,7 @@ function FormAddPackage(props) {
                 <button
                   type="submit"
                   className={`btn btn-primary font-weight-bold ${
-                    addPackageLoading === "loading"
+                    addLinkLoading === "loading"
                       ? "spinner spinner-white spinner-right mr-3 disabled"
                       : ""
                   }`}
@@ -129,4 +117,4 @@ function FormAddPackage(props) {
   );
 }
 
-export default FormAddPackage;
+export default FormAddLink;

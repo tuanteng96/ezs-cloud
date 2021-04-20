@@ -30,7 +30,9 @@ function FormEditPackage(props) {
     Price: Yup.string().required("Vui lòng nhập tiền nguyên giá.").nullable(),
   });
 
-  const { editPackageLoading } = useSelector((state) => state.userPackage);
+  const { editPackageLoading } = useSelector(
+    (state) => state.userConfiguration
+  );
   return (
     <Formik
       initialValues={initialValues}

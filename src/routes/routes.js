@@ -6,7 +6,7 @@ import { PrivateRoute } from "../auth/PrivateRoute";
 import history from "../helpers/history";
 import { getUser } from "../helpers/localStorageUser";
 const NotFound = lazy(() => import("../components/NotFound/index"));
-const Packages = lazy(() => import("../features/Packages/index"));
+const Configuration = lazy(() => import("../features/Configuration/index"));
 const Dashboard = lazy(() => import("../features/Dashboard/index"));
 const Login = lazy(() => import("../features/Login/index"));
 const Registration = lazy(() => import("../features/Registration/index"));
@@ -25,7 +25,10 @@ export default function Routes() {
         <BrowserRouter>
           <Switch>
             <Redirect exact from={PATH.HOME} to={defaultLink} />
-            <PrivateRoute path={PATH.PACKAGES} component={Packages} />
+            <Route
+              path={PATH.CONFIGURATION}
+              component={Configuration}
+            />
             <PrivateRoute path={PATH.DASHBOARD} component={Dashboard} />
             <PrivateRoute path={PATH.SETTING} component={Settings} />
             <PrivateRoute path={PATH.BUILDER} component={Builder} />

@@ -13,8 +13,9 @@ import { Modal } from "react-bootstrap";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import FormEditPackage from "../../components/FormEditPackage";
 import SkeletonPackage from "../../components/Skeleton/SkeletonPackage";
+import { PATH } from "../../../../constants/paths";
 
-function Main(props) {
+function Package(props) {
   const dispatch = useDispatch();
 
   useEffect(async () => {
@@ -27,7 +28,7 @@ function Main(props) {
   }, [dispatch]);
 
   const { listPackages, packageLoading } = useSelector(
-    (state) => state.userPackage
+    (state) => state.userConfiguration
   );
   const [modalAddShow, setModalAddShow] = React.useState(false);
   const [modalEditShow, setModalEditShow] = React.useState(false);
@@ -140,7 +141,18 @@ function Main(props) {
                   </Link>
                 </li>
                 <li className="breadcrumb-item text-muted">
-                  <Link to="/quan-ly-goi" className="text-muted">
+                  <Link
+                    to={`${PATH.CONFIGURATION}`}
+                    className="text-muted"
+                  >
+                    Cấu hình
+                  </Link>
+                </li>
+                <li className="breadcrumb-item text-muted">
+                  <Link
+                    to={`${PATH.CONFIGURATION}/quan-ly-goi`}
+                    className="text-muted"
+                  >
                     Quản lý gói
                   </Link>
                 </li>
@@ -236,9 +248,7 @@ function Main(props) {
           {/*begin::Container*/}
           <div className="container">
             {/*begin::Card*/}
-            {
-              packageLoading !== "success" && <SkeletonPackage />
-            }
+            {packageLoading !== "success" && <SkeletonPackage />}
             <div className="card card-custom gutter-b">
               <div className="card-body py-20">
                 <div className="row">
@@ -267,4 +277,4 @@ function Main(props) {
   );
 }
 
-export default Main;
+export default Package;

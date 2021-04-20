@@ -2,7 +2,7 @@ export const PATH = {
     HOME: "/",
     LOGIN: "/login",
     FORGOT: "/forgot",
-    PACKAGES: "/quan-ly-goi",
+    CONFIGURATION: "/cau-hinh",
     DASHBOARD: "/dashboard",
     SETTING: "/setting",
     BUILDER: "/builder",

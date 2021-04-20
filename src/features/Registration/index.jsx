@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { getToken } from "../../helpers/localStorageUser";
 import FormRegistration from "../Registration/components/FormRegistration";
 import "./css/style.scss";
+import ReCAPTCHA from "react-google-recaptcha";
 // import PropTypes from 'prop-types';
 
 // Registration.propTypes = {
@@ -13,6 +14,8 @@ import "./css/style.scss";
 const isLogin = () => {
   return getToken() ? true : false;
 };
+
+const recaptchaRef = React.createRef();
 
 function Registration(props) {
   useEffect(() => {
@@ -95,7 +98,13 @@ function Registration(props) {
                     </div>
                     <div className="col-lg-7">
                       <div className="py-8 px-8 pt-lg-18 pb-lg-20 px-lg-20">
-                        <FormRegistration />
+                        <FormRegistration recaptchaRef={recaptchaRef} />
+                        <ReCAPTCHA
+                          ref={recaptchaRef}
+                          size="invisible"
+                          sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                          //onChange={handleLogin}
+                        />
                       </div>
                     </div>
                   </div>

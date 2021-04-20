@@ -9,10 +9,11 @@ InputFieldUSN.propTypes = {
   field: PropTypes.object.isRequired,
   form: PropTypes.object.isRequired,
   placeholder: PropTypes.string,
-  type: PropTypes.string,
-  desc: PropTypes.string,
-  label: PropTypes.string,
-  disabled: PropTypes.string,
+  type: PropTypes.string.isRequired,
+  desc: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  disabled: PropTypes.string.isRequired,
+  recaptchaRef: PropTypes.object.isRequired,
 };
 InputFieldUSN.defaultProps = {
   placeholder: "",
@@ -20,6 +21,7 @@ InputFieldUSN.defaultProps = {
   desc: "",
   label: "",
   disabled: "",
+  recaptchaRef: null,
 };
 
 function InputFieldUSN(props) {
@@ -31,6 +33,7 @@ function InputFieldUSN(props) {
     desc,
     label,
     disabled,
+    recaptchaRef,
   } = props;
 
   const dispatch = useDispatch();
@@ -55,14 +58,16 @@ function InputFieldUSN(props) {
     //   return false;
     // }
 
-    const data = {
-      name: value,
-      type: "user",
-    };
-
     if (time) clearTimeout(time);
     setTime(
       setTimeout(async () => {
+        const token = await recaptchaRef.current.executeAsync();
+        const data = {
+          name: value,
+          type: "user",
+          token: token,
+        };
+
         const result = await dispatch(existValidate(data));
         const resultUn = unwrapResult(result);
         if (resultUn) {

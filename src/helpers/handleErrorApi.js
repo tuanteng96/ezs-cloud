@@ -1,3 +1,5 @@
+import Swal from "sweetalert2/dist/sweetalert2.js";
+
 const SwitchLanguage = (text) => {
     switch (text) {
         case "The Pwd field is required.":
@@ -37,4 +39,18 @@ export const handelErrorApi = (errors) => {
         errorMessage[key] = changeArrErr(value).join(' & ');
     });
     return errorMessage;
+}
+
+export const handelErrorApiSwal = (errors) => {
+    if (typeof errors !== 'object' && errors === null) return false;
+    var fErr = '';
+    for (var k in errors.errors) {
+        if (Array.isArray(errors.errors[k])) fErr = errors.errors[k][0];
+        if (fErr) break;
+    }
+    Swal.fire({
+        icon: 'error',
+        title: 'Xảy ra lỗi',
+        text: fErr,
+    })
 }

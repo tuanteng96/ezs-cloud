@@ -2,6 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { formatVND } from "../../../helpers/globalFormat";
+import { PATH } from "../../../constants/paths";
 PackageItem.propTypes = {
   packageItem: PropTypes.object.isRequired,
   onDelete: PropTypes.func.isRequired,
@@ -70,7 +71,7 @@ function PackageItem(props) {
         </h4>
         <ul className="list-unstyled text-muted mb-10">
           <li>
-            {packageItem.Options
+            {packageItem.Links
               ? `${packageItem.Links.length} Link được phép sử
             dụng`
               : `Link chưa cấu hình`}
@@ -80,7 +81,6 @@ function PackageItem(props) {
               ? `${packageItem.Options.length} Option được cấu hình`
               : `Option chưa cấu hình`}
           </li>
-          <li>Đang cập nhập ...</li>
         </ul>
         <div className="btn-group dropup">
           <button
@@ -150,7 +150,12 @@ function PackageItem(props) {
                 </a>
               </li>
               <li className="navi-item">
-                <a href="#" className="navi-link">
+                <Link
+                  to={{
+                    pathname: `${PATH.CONFIGURATION}/quan-ly-goi/${packageItem.Id}/link`,
+                  }}
+                  className="navi-link"
+                >
                   <span className="navi-icon">
                     <i className="flaticon2-world" />
                   </span>
@@ -162,7 +167,7 @@ function PackageItem(props) {
                       </span>
                     </span>
                   )}
-                </a>
+                </Link>
               </li>
               <div className="dropdown-divider"></div>
               <li className="navi-item" onClick={() => onDelete(packageItem)}>

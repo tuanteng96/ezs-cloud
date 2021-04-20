@@ -2,7 +2,13 @@ import { FastField, Form, Formik } from "formik";
 import React, { useCallback, useState } from "react";
 import GoogleLoginAuth from "../../../components/GoogleLoginAuth";
 import * as Yup from "yup";
-import { registration, verify, getDomain, getSuggest, reVerify } from "../asyncActions";
+import {
+  registration,
+  verify,
+  getDomain,
+  getSuggest,
+  reVerify,
+} from "../asyncActions";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,8 +31,17 @@ import { _, debounce } from "lodash";
 import { setLoadingBrand, setLoadingFName } from "../registrationSlice";
 import InputFieldUSN from "./InputFieldUSN";
 import { toast, ToastContainer } from "react-toastify";
+import PropTypes from "prop-types";
 
-function FormRegistration(props) {
+FormRegistration.propTypes = {
+  recaptchaRef: PropTypes.object.isRequired,
+};
+
+FormRegistration.defaultProps = {
+  recaptchaRef: null,
+};
+
+function FormRegistration({ recaptchaRef }) {
   const initialValues = {
     FullName: "",
     USN: "",
@@ -77,10 +92,10 @@ function FormRegistration(props) {
   });
 
   const dispatch = useDispatch();
-  let history = useHistory();
 
   const { registrationStatus } = useSelector((state) => state.userRegistration);
   const [loadingOTP, setLoadingOTP] = useState(false);
+  let token;
 
   const handleSubmit = async (values, { setErrors, resetForm }) => {
     const dataRegistration = Object.assign(
@@ -91,9 +106,14 @@ function FormRegistration(props) {
     dataRegistration.RegPhone = formatPhone84(dataRegistration.RegPhone);
 
     try {
-      const resultAction = await dispatch(registration(dataRegistration));
+      token = await recaptchaRef.current.executeAsync();
+      const resultAction = await dispatch(
+        registration({
+          values: dataRegistration,
+          token: token,
+        })
+      );
       const resultData = unwrapResult(resultAction);
-
       setLoadingOTP(true);
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setLoadingOTP(false);
@@ -114,14 +134,23 @@ function FormRegistration(props) {
         allowOutsideClick: false,
         preConfirm: async (code) => {
           try {
+            recaptchaRef.current.reset();
+            token = await recaptchaRef.current.executeAsync();
             const resultVerify = await dispatch(
-              verify({ UserID: resultData.user.Id, Secure: code })
+              verify({ UserID: resultData.user.Id, Secure: code, token: token })
             );
             const resultVerifyUn = unwrapResult(resultVerify);
+
+            recaptchaRef.current.reset();
+            token = await recaptchaRef.current.executeAsync();
+
             const resultLoginAction = await dispatch(
               getDomain({
-                Name: values.USN,
-                Pwd: values.Pwd,
+                values: {
+                  Name: values.USN,
+                  Pwd: values.Pwd,
+                },
+                token: token,
               })
             );
             const resultLoginData = unwrapResult(resultLoginAction);
@@ -135,8 +164,13 @@ function FormRegistration(props) {
         },
         preDeny: async () => {
           try {
+            recaptchaRef.current.reset();
+            token = await recaptchaRef.current.executeAsync();
             const resultResetreVerify = await dispatch(
-              reVerify(resultData.user.Id)
+              reVerify({
+                userId: resultData.user.Id,
+                token: token
+              })
             );
             const resultResetreVerifyUn = unwrapResult(resultResetreVerify);
             await new Promise((resolve) => setTimeout(resolve, 500));
@@ -187,9 +221,11 @@ function FormRegistration(props) {
       await dispatch(setLoadingBrand(false));
       return false;
     }
+    const token = await recaptchaRef.current.executeAsync();
     const data = {
       name: evt,
       type: "brand",
+      token: token,
     };
     const result = await dispatch(getSuggest(data));
     const resultUn = unwrapResult(result);
@@ -213,9 +249,11 @@ function FormRegistration(props) {
       await dispatch(setLoadingFName(false));
       return false;
     }
+    const token = await recaptchaRef.current.executeAsync();
     const data = {
       name: evt,
       type: "user",
+      token: token
     };
     const result = await dispatch(getSuggest(data));
     const resultUn = unwrapResult(result);
@@ -290,6 +328,7 @@ function FormRegistration(props) {
                 label="Đường quản trị của bạn"
                 type="text"
                 desc="Đường dẫn truy cập quản lý Spa của bạn."
+                recaptchaRef={recaptchaRef}
               />
               <FastField
                 name="USN"
@@ -298,6 +337,7 @@ function FormRegistration(props) {
                 label="Tên tài khoản"
                 type="text"
                 desc="Sử dụng tài khoản này để đăng nhập hệ thống."
+                recaptchaRef={recaptchaRef}
               />
               <div className="row">
                 <div className="col-xl-6">

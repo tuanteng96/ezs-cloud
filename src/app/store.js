@@ -4,7 +4,7 @@ import staffReducer from "../features/Staff/staffSlice";
 import loginReducer from "../features/Login/loginSlice";
 import registrationReducer from "../features/Registration/registrationSlice";
 import forgotReducer from "../features/Forgot/forgotSlice";
-import packageReducer from "../features/Packages/packageSlice";
+import configurationReducer from "../features/Configuration/configurationSlice";
 
 
 const rootReducer = {
@@ -13,7 +13,7 @@ const rootReducer = {
     userLogin: loginReducer,
     userRegistration: registrationReducer,
     userForgot: forgotReducer,
-    userPackage: packageReducer,
+    userConfiguration: configurationReducer,
 }
 const store = configureStore({
     reducer: rootReducer

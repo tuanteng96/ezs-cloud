@@ -7,16 +7,16 @@ import Swal from "sweetalert2";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./css/style.scss";
-import { login, requireVerifyPhone, reVerify, verify } from "./asyncActions";
+import { login, reVerify, verify } from "./asyncActions";
 import { unwrapResult } from "@reduxjs/toolkit";
 import { setLoadingOTP } from "./loginSlice";
+import ReCAPTCHA from "react-google-recaptcha";
 
 const isLogin = () => {
   return getToken() ? true : false;
 };
 
 function Login(props) {
-
   const dispatch = useDispatch();
   let history = useHistory();
 
@@ -31,16 +31,23 @@ function Login(props) {
     return <Redirect to="/" />;
   }
 
+  const recaptchaRef = React.createRef();
+
   const handleLogin = async (values, { setErrors, resetForm }) => {
     try {
-      const resultAction = await dispatch(login(values));
+      const token = await recaptchaRef.current.executeAsync();
+      const resultAction = await dispatch(
+        login({
+          values: values,
+          token: token,
+        })
+      );
       const resultData = unwrapResult(resultAction);
       const Link = resultData.UserInfo.UI.Links[0].Link;
       history.push(Link);
     } catch (error) {
-      
       if (unauthenAccount(error && error)) {
-        const {UserId} = unauthenAccount(error && error);
+        const { UserId } = unauthenAccount(error && error);
 
         Swal.fire({
           title: "Yêu cầu xác thực tài khoản.",
@@ -81,7 +88,7 @@ function Login(props) {
                   await new Promise((resolve) => setTimeout(resolve, 500));
                   const resultAction = await dispatch(login(values));
                   const resultData = unwrapResult(resultAction);
-                  
+
                   const Link = resultData.UserInfo.UI.Links[0].Link;
                   return new Promise((resolve, reject) => {
                     resolve(Link);
@@ -129,10 +136,13 @@ function Login(props) {
   };
 
   const unauthenAccount = (error) => {
-    
-    if (error.errors && error.errors && error.errors.USN[0] === "TK_CHUA_XAC_THUC") {
+    if (
+      error.errors &&
+      !error.errors.messages &&
+      error.errors.USN[0] === "TK_CHUA_XAC_THUC"
+    ) {
       return {
-        UserId: error.appendData.UserId
+        UserId: error.appendData.UserId,
       };
     } else {
       return null;
@@ -179,6 +189,12 @@ function Login(props) {
               <div className="login-form login-signin">
                 {/*begin::Form*/}
                 <FormLogin onSubmit={handleLogin} />
+                <ReCAPTCHA
+                  ref={recaptchaRef}
+                  size="invisible"
+                  sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+                  //onChange={handleLogin}
+                />
                 {/*end::Form*/}
               </div>
               {/*end::Signin*/}

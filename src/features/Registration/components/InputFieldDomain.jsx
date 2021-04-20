@@ -13,16 +13,18 @@ InputFieldDomain.propTypes = {
   type: PropTypes.string,
   desc: PropTypes.string,
   label: PropTypes.string,
+  recaptchaRef: PropTypes.object.isRequired,
 };
 InputFieldDomain.defaultProps = {
   placeholder: "",
   type: "text",
   desc: "",
   label: "",
+  recaptchaRef: null,
 };
 
 function InputFieldDomain(props) {
-  const { field, form, type, placeholder, desc, label } = props;
+  const { field, form, type, placeholder, desc, label, recaptchaRef } = props;
 
   const { loadingBrand, errorBrand } = useSelector(
     (state) => state.userRegistration
@@ -40,19 +42,15 @@ function InputFieldDomain(props) {
     field.onChange(evt);
     setIsloading(true);
 
-    // if (errors[name] || value.length < 1) {
-    //   dispatch(setErrorBrand(null))
-    //   setIsloading(false);
-    //   return false;
-    // }
-    const data = {
-      name: value + ".ezs.vn",
-      type: "brand",
-    };
-
     if (time) clearTimeout(time);
     setTime(
       setTimeout(async () => {
+        const token = await recaptchaRef.current.executeAsync();
+        const data = {
+          name: value + ".ezs.vn",
+          type: "brand",
+          token: token,
+        };
         const result = await dispatch(existValidate(data));
         const resultUn = unwrapResult(result);
         if (resultUn) {

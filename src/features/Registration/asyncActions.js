@@ -53,9 +53,9 @@ export const existValidate = createAsyncThunk('/user/exist', async(data, { rejec
         return rejectWithValue(error.response.data)
     }
 });
-export const getPackage = createAsyncThunk('/user/getpackage', async(data, { rejectWithValue }) => {
+export const getPackage = createAsyncThunk('/user/getpackage', async(token, { rejectWithValue }) => {
     try {
-        const result = await userApi.getPackage();
+        const result = await userApi.getPackage(token);
         return result.data;
     } catch (error) {
         return rejectWithValue(error.response.data)

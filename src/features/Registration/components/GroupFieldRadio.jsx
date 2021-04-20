@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { useDispatch } from "react-redux";
 import { getPackage } from "./../asyncActions";
 import { unwrapResult } from "@reduxjs/toolkit";
+import ReCAPTCHA from "react-google-recaptcha";
+import { formatVND } from "../../../helpers/globalFormat";
 
 GroupFieldRadio.propTypes = {
   field: PropTypes.object.isRequired,
@@ -25,10 +27,14 @@ function GroupFieldRadio(props) {
   const dispatch = useDispatch();
   const [arrPackage, setArrPackage] = useState([]);
 
+  const recaptchaRef = React.createRef();
+
   useEffect(() => {
     const fetchData = async () => {
-      const result = await dispatch(getPackage());
+      const token = await recaptchaRef.current.executeAsync();
+      const result = await dispatch(getPackage(token));
       const resultUn = unwrapResult(result);
+      console.log(resultUn);
       setArrPackage(resultUn);
     };
     fetchData();
@@ -48,9 +54,14 @@ function GroupFieldRadio(props) {
                   </span>
                 </span>
                 <span className="option-label">
-                  <span className="option-head flex-column">
-                    <span className="option-title">{item.Title}</span>
-                    <span className="option-focus text-primary">{item.Name}</span>
+                  <span className="option-head">
+                    <span className="option-title font-weight-800">
+                      {item.Name}
+                    </span>
+                    <span className="option-focus font-weight-800 text-danger">
+                      {item.Price ? `${formatVND(item.Price)}` : "Free"}
+                      {item.Price ? <span className="ml-1">đ</span> :  ""}
+                    </span>
                   </span>
                   <span className="option-body">
                     Estimated 14-20 Day Shipping (Duties and taxes may be due
@@ -68,6 +79,12 @@ function GroupFieldRadio(props) {
           </div>
         )}
       </div>
+      <ReCAPTCHA
+        ref={recaptchaRef}
+        size="invisible"
+        sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+        //onChange={handleLogin}
+      />
     </div>
   );
 }
