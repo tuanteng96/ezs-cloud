@@ -35,7 +35,7 @@ function Login(props) {
 
   const handleLogin = async (values, { setErrors, resetForm }) => {
     try {
-      const token = await recaptchaRef.current.executeAsync();
+      let token = await recaptchaRef.current.executeAsync();
       const resultAction = await dispatch(
         login({
           values: values,
@@ -56,8 +56,12 @@ function Login(props) {
           confirmButtonText: "Lấy mã xác thực",
           showLoaderOnConfirm: true,
           preConfirm: async () => {
+            recaptchaRef.current.reset();
+            let token = await recaptchaRef.current.executeAsync();
             await dispatch(setLoadingOTP(true));
-            const resultReVerify = await dispatch(reVerify(UserId));
+            const resultReVerify = await dispatch(
+              reVerify({ userId: UserId, token: token })
+            );
             const resultReVerifyUn = unwrapResult(resultReVerify);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             await dispatch(setLoadingOTP(false));
@@ -81,12 +85,22 @@ function Login(props) {
                   return;
                 }
                 try {
+                  recaptchaRef.current.reset();
+                  let token = await recaptchaRef.current.executeAsync();
                   const verifyUser = await dispatch(
-                    verify({ UserID: UserId, Secure: code })
+                    verify({ UserID: UserId, Secure: code, token: token })
                   );
                   const verifyUserUn = unwrapResult(verifyUser);
                   await new Promise((resolve) => setTimeout(resolve, 500));
-                  const resultAction = await dispatch(login(values));
+
+                  recaptchaRef.current.reset();
+                  token = await recaptchaRef.current.executeAsync();
+                  const resultAction = await dispatch(
+                    login({
+                      values: values,
+                      token: token,
+                    })
+                  );
                   const resultData = unwrapResult(resultAction);
 
                   const Link = resultData.UserInfo.UI.Links[0].Link;
@@ -99,7 +113,14 @@ function Login(props) {
               },
               preDeny: async () => {
                 try {
-                  const resultResetreVerify = await dispatch(reVerify(UserId));
+                  recaptchaRef.current.reset();
+                  let token = await recaptchaRef.current.executeAsync();
+                  const resultResetreVerify = await dispatch(
+                    reVerify({
+                      userId: UserId,
+                      token: token,
+                    })
+                  );
                   const resultResetreVerifyUn = unwrapResult(
                     resultResetreVerify
                   );

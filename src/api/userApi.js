@@ -16,16 +16,32 @@ class userApi {
         });
     }
     resetforgot(data) {
-        return axiosClient.post(`/api/v1/user/resetpwd`, JSON.stringify(data));
+        return axiosClient.post(`/api/v1/user/resetpwd`, JSON.stringify(data.data), {
+            headers: {
+                "g-recaptcha-response": data.token
+            }
+        });
     }
-    requireVerifyPhone(phone) {
-        return axiosClient.get(`/api/v1/user/requireVerifyPhone?Phone=${phone}`);
+    requireVerifyPhone(data) {
+        return axiosClient.get(`/api/v1/user/requireVerifyPhone?Phone=${data.phone}`, {
+            headers: {
+                "g-recaptcha-response": data.token
+            }
+        });
     }
     verifyPhoneForgot(data) {
-        return axiosClient.get(`/api/v1/user/verifyPhone?Phone=${data.Phone}&secure=${data.secure}`);
+        return axiosClient.get(`/api/v1/user/verifyPhone?Phone=${data.Phone}&secure=${data.secure}`, {
+            headers: {
+                "g-recaptcha-response": data.token
+            }
+        });
     }
     findUsersByPhone(data) {
-        return axiosClient.post(`/api/v1/user/find-users-by-phone`, JSON.stringify(data));
+        return axiosClient.post(`/api/v1/user/find-users-by-phone`, JSON.stringify(data.data), {
+            headers: {
+                "g-recaptcha-response": data.token
+            }
+        });
     }
     getSuggest(data) {
         return axiosClient.post(`/api/v1/user/suggest?name=${data.name}&type=${data.type}`, null, {

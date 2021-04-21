@@ -22,6 +22,7 @@ import {
   setPhoneSecure,
   setLoadingResetPwd,
 } from "./forgotSlice";
+import ReCAPTCHA from "react-google-recaptcha";
 // import PropTypes from 'prop-types';
 
 // Forgot.propTypes = {};
@@ -46,11 +47,19 @@ function Forgot(props) {
     return <Redirect to="/" />;
   }
 
+  const recaptchaRef = React.createRef();
+
   const handleSubmit = async (values, { setErrors, resetForm }) => {
     const phone = `84${values.Phone}`;
     try {
+      let token = await recaptchaRef.current.executeAsync();
       await dispath(setLoadingPhone(true));
-      const resultRequire = await dispath(requireVerifyPhone(phone));
+      const resultRequire = await dispath(
+        requireVerifyPhone({
+          phone: phone,
+          token: token,
+        })
+      );
       unwrapResult(resultRequire);
       await dispath(setSendOTP(true));
       await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -68,20 +77,28 @@ function Forgot(props) {
         showLoaderOnConfirm: true,
         preConfirm: async (code) => {
           try {
+            recaptchaRef.current.reset();
+            let token = await recaptchaRef.current.executeAsync();
             const resultPhone = await dispath(
               verifyPhone({
                 Phone: phone,
                 secure: code,
+                token: token,
               })
             );
             const resultPhoneUn = unwrapResult(resultPhone);
 
             await dispath(setPhoneSecure(resultPhoneUn.phoneSecure));
 
+            recaptchaRef.current.reset();
+            token = await recaptchaRef.current.executeAsync();
             const resultListUser = await dispath(
               findUsersByPhone({
-                Phone: phone,
-                PhoneSecure: resultPhoneUn.phoneSecure,
+                data: {
+                  Phone: phone,
+                  PhoneSecure: resultPhoneUn.phoneSecure,
+                },
+                token: token,
               })
             );
             const resultListUserUn = unwrapResult(resultListUser);
@@ -104,11 +121,16 @@ function Forgot(props) {
     }
   };
 
-
   const handleResetPwd = async (values, { setErrors, resetForm }) => {
     try {
+      let token = await recaptchaRef.current.executeAsync();
       await dispath(setLoadingResetPwd(true));
-      const result = await dispath(resetForgot(values));
+      const result = await dispath(
+        resetForgot({
+          data: values,
+          token: token,
+        })
+      );
       const resultUn = unwrapResult(result);
       await new Promise((resolve) => setTimeout(resolve, 500));
       await dispath(setLoadingResetPwd(false));
@@ -119,17 +141,15 @@ function Forgot(props) {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        cancelButtonText:"Tiếp tục",
+        cancelButtonText: "Tiếp tục",
         confirmButtonText: "Đăng nhập tài khoản",
       }).then((result) => {
         if (result.isConfirmed) {
           history.push("/login");
-        }
-        else {
+        } else {
           setIsChangePwd(false);
         }
       });
-
     } catch (errors) {
       console.log(errors);
       await dispath(setLoadingResetPwd(false));
@@ -271,6 +291,11 @@ function Forgot(props) {
                 </div>
               </div>
               {/*end::Signin*/}
+              <ReCAPTCHA
+                ref={recaptchaRef}
+                size="invisible"
+                sitekey={process.env.REACT_APP_RECAPTCHA_SITE_KEY}
+              />
             </div>
           </div>
         </div>
