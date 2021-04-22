@@ -5,6 +5,7 @@ import { PrivateRoute } from '../../auth/PrivateRoute';
 import Links from './Pages/Links';
 import Package from "./Pages/Package";
 import PackageLink from './Pages/PackageLink';
+import Option from './Pages/Option'
 // import PropTypes from 'prop-types';
 
 // Package.propTypes = {
@@ -26,6 +27,7 @@ function Configuration(props) {
         path={`${match.url}/quan-ly-goi/:Id/link`}
         component={PackageLink}
       />
+      <Route path={`${match.url}/quan-ly-goi/:Id/option`} component={Option} />
     </Switch>
   );
 }

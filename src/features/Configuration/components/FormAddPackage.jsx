@@ -22,6 +22,9 @@ function FormAddPackage(props) {
     Name: "",
     Price: "",
     IsPublic: true,
+    NumOfMembers: "",
+    NumOfUsers: "",
+    NumOfLocations: "",
   };
   const validationSchema = Yup.object().shape({
     Name: Yup.string()
@@ -85,6 +88,33 @@ function FormAddPackage(props) {
                     desc="Số tiền nguyên giá"
                     type="number"
                     defaultValue={true}
+                  />
+
+                  <FastField
+                    name="NumOfMembers"
+                    component={FieldInput}
+                    placeholder="Số lượng Member"
+                    label="Số lượng Member"
+                    desc="Số lượng Member"
+                    type="text"
+                  />
+
+                  <FastField
+                    name="NumOfUsers"
+                    component={FieldInput}
+                    placeholder="Số lượng Users"
+                    label="Số lượng Users"
+                    desc="Số lượng Users"
+                    type="text"
+                  />
+
+                  <FastField
+                    name="NumOfLocations"
+                    component={FieldInput}
+                    placeholder="Số chi nhánh"
+                    label="Số chi nhánh"
+                    desc="Số chi nhánh"
+                    type="text"
                   />
 
                   <FastField

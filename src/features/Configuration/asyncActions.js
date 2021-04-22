@@ -34,6 +34,14 @@ export const deletePackage = createAsyncThunk('/sys/delete-package', async(data,
         return rejectWithValue(error.response.data)
     }
 });
+export const addOption = createAsyncThunk('/sys/add-option', async(data, { rejectWithValue }) => {
+    try {
+        const result = await configurationApi.addEditPackage(data);
+        return result.data;
+    } catch (error) {
+        return rejectWithValue(error.response.data)
+    }
+});
 export const getListLink = createAsyncThunk('/sys/get-list-link', async(params, { rejectWithValue }) => {
     try {
         const result = await configurationApi.getListLink();

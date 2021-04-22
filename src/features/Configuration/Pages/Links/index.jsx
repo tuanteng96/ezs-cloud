@@ -40,7 +40,8 @@ function Links(props) {
 
   const onAddLink = async (values, { setErrors, resetForm }) => {
     const checkLink = listLink.filter((item) => item.Link === values.Link);
-    if (checkLink > 0) {
+    
+    if (checkLink.length === 0) {
       try {
         const result = await dispatch(addLink(values));
         const resultUn = unwrapResult(result);
@@ -64,8 +65,9 @@ function Links(props) {
     setLinkEdit(item);
   };
   const onEditLink = async (values, { setErrors, resetForm }) => {
-    const checkLink = listLink.filter((item) => item.Link === values.Link);
-    if (checkLink > 0) {
+    const checkLink = listLink.filter((item) => item.Link !== values.Link);
+    const checkIsLink = checkLink.filter((item) => item.Link === values.Link);
+    if (checkIsLink.length === 0) {
       try {
         const result = await dispatch(editLink(values));
         const resultUn = unwrapResult(result);

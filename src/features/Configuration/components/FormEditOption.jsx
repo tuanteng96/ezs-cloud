@@ -7,37 +7,36 @@ import FieldInput from "./FieldInput";
 import FieldSwitch from "./FieldSwitch";
 import { useSelector } from "react-redux";
 
-FormEditPackage.propTypes = {
-  onEditPackage: PropTypes.func.isRequired,
+FormEditOption.propTypes = {
+  onEditOption: PropTypes.func.isRequired,
   onHide: PropTypes.func.isRequired,
-  initiaValue: PropTypes.object.isRequired,
+  initial: PropTypes.object.isRequired,
 };
-FormEditPackage.defaultProps = {
-  onEditPackage: null,
+FormEditOption.defaultProps = {
+  onEditOption: null,
   onHide: null,
-  initiaValue: {},
+  initial: null,
 };
 
-function FormEditPackage(props) {
-  const { onEditPackage, onHide, initiaValue } = props;
-
-  const initialValues = initiaValue;
+function FormEditOption(props) {
+  const { onEditOption, onHide, initial } = props;
+  const initialValues = initial;
   const validationSchema = Yup.object().shape({
-    Name: Yup.string()
-      .min(3, "Tài gói quá ngắn - tối thiểu phải có 3 ký tự.")
-      .max(50, "Tài gói quá dài - nhiều nhất 50 ký tự.")
-      .required("Vui lòng nhập tên gói."),
-    Price: Yup.string().required("Vui lòng nhập tiền nguyên giá.").nullable(),
+    Title: Yup.string().required("Vui lòng nhập tên Option."),
+    DayQty: Yup.string().required("Vui lòng nhập ngày của Option."),
+    Price: Yup.string().required("Vui lòng nhập nguyên giá Option."),
+    PriceSale: Yup.string().required(
+      "Vui lòng nhập nguyên giá khuyến mãi Option."
+    ),
+    DayBonus: Yup.string().required("Vui lòng nhập thời gian làm thêm."),
   });
 
-  const { editPackageLoading } = useSelector(
-    (state) => state.userConfiguration
-  );
+  const { addLinkLoading } = useSelector((state) => state.userConfiguration);
   return (
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={onEditPackage}
+      onSubmit={onEditOption}
     >
       {(formikProps) => {
         const { values, errors, touched } = formikProps;
@@ -50,38 +49,41 @@ function FormEditPackage(props) {
                   className="modal-title font-weight-800"
                   id="exampleModalLabel"
                 >
-                  Gói{" "}
-                  <b className="font-weight-800 text-success">
-                    {initiaValue.Name}
-                  </b>
+                  {initial && initial.Title}
                 </h5>
                 <button
                   type="button"
                   className="close"
                   data-dismiss="modal"
                   aria-label="Close"
+                  onClick={onHide}
                 >
                   <i aria-hidden="true" className="ki ki-close" />
                 </button>
               </div>
               <div
                 className={`modal-body ${
-                  editPackageLoading === "loading"
-                    ? "overlay overlay-block"
-                    : ""
+                  addLinkLoading === "loading" ? "overlay overlay-block" : ""
                 }`}
               >
                 {/* overlay overlay-block */}
-                <div className="overlay-wrapper">
+                <div className="overlay-wrapper form-group-child">
                   <FastField
-                    name="Name"
+                    name="Title"
                     component={FieldInput}
-                    placeholder="Nhập tên gói"
-                    label="Tên gói"
-                    desc="Tên hiển thị gói"
+                    placeholder="Nhập tên Option"
+                    label="Tên Option"
+                    desc="Tên hiển thị Option"
                     type="text"
                   />
-
+                  <FastField
+                    name="DayQty"
+                    component={FieldInput}
+                    placeholder="Thời gian sử dụng"
+                    label="Thời gian sử dụng"
+                    desc="Thời gian sử dụng"
+                    type="text"
+                  />
                   <FastField
                     name="Price"
                     component={FieldInputPrice}
@@ -91,42 +93,25 @@ function FormEditPackage(props) {
                     type="number"
                     defaultValue={true}
                   />
-
                   <FastField
-                    name="NumOfMembers"
-                    component={FieldInput}
-                    placeholder="Số lượng Member"
-                    label="Số lượng Member"
-                    desc="Số lượng Member"
-                    type="text"
+                    name="PriceSale"
+                    component={FieldInputPrice}
+                    placeholder="Giá khuyến mãi"
+                    label="Giá khuyến mãi"
+                    desc="Số tiền khuyến mãi"
+                    type="number"
+                    defaultValue={true}
                   />
-
                   <FastField
-                    name="NumOfUsers"
+                    name="DayBonus"
                     component={FieldInput}
-                    placeholder="Số lượng Users"
-                    label="Số lượng Users"
-                    desc="Số lượng Users"
+                    placeholder="Thời gian tặng thêm"
+                    label="Thời gian tặng thêm"
+                    desc="Thời gian tặng thêm"
                     type="text"
-                  />
-
-                  <FastField
-                    name="NumOfLocations"
-                    component={FieldInput}
-                    placeholder="Số chi nhánh"
-                    label="Số chi nhánh"
-                    desc="Số chi nhánh"
-                    type="text"
-                  />
-
-                  <FastField
-                    name="IsPublic"
-                    component={FieldSwitch}
-                    label="Trạng thái"
-                    type="checkbox"
                   />
                 </div>
-                {editPackageLoading === "loading" ? (
+                {addLinkLoading === "loading" ? (
                   <div className="overlay-layer bg-dark-o-10">
                     <div className="spinner spinner-primary"></div>
                   </div>
@@ -145,12 +130,12 @@ function FormEditPackage(props) {
                 <button
                   type="submit"
                   className={`btn btn-primary font-weight-bold ${
-                    editPackageLoading === "loading"
+                    addLinkLoading === "loading"
                       ? "spinner spinner-white spinner-right mr-3 disabled"
                       : ""
                   }`}
                 >
-                  Lưu thay đổi
+                  Cập nhập
                 </button>
               </div>
             </div>
@@ -161,4 +146,4 @@ function FormEditPackage(props) {
   );
 }
 
-export default FormEditPackage;
+export default FormEditOption;

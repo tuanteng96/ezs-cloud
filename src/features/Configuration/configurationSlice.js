@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getPackage, addPackage, deletePackage, editPackage, getListLink, addLink, deleteLink, editLink } from './asyncActions';
+import { getPackage, addPackage, deletePackage, editPackage, getListLink, addLink, deleteLink, editLink, addOption } from './asyncActions';
 
 const configurationSlice = createSlice({
     name: 'configuration',
@@ -9,6 +9,7 @@ const configurationSlice = createSlice({
         listLink: [],
         linkCurren: [],
         linkLoading: "idle",
+        listOption: null,
         packageError: null,
         addPackageLoading: "idle",
         editPackageLoading: "idle",
@@ -23,9 +24,15 @@ const configurationSlice = createSlice({
             }
         },
         setChecked: (state, { payload }) => {
-            const index = state.linkCurren.findIndex(item => item.Id === payload.Id);
+            const index = state.linkCurren.findIndex(item => parseInt(item.Id) === parseInt(payload.Id));
             if (index !== -1) {
                 state.linkCurren[index].isCheck = payload.isCheck
+            }
+        },
+        setOption: (state, { payload }) => {
+            return {
+                ...state,
+                listOption: payload
             }
         }
     },
@@ -98,8 +105,14 @@ const configurationSlice = createSlice({
                 listLink: state.listLink.filter((item) => item.Id !== payload.Id)
             }
         },
+        [addOption.fulfilled]: (state, { payload }) => {
+            return {
+                ...state,
+                listOption: payload
+            }
+        },
     }
 });
 const { reducer: configurationReducer, actions } = configurationSlice;
-export const { setLinkCurrent, setChecked } = actions;
+export const { setLinkCurrent, setChecked, setOption } = actions;
 export default configurationReducer;

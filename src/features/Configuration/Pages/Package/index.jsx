@@ -4,7 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import MainLayout from "../../../../layouts/MainLayout";
 import SubHeaderLayout from "../../../../layouts/SubHeaderLayout";
-import { addPackage, deletePackage, editPackage, getPackage } from "../../asyncActions";
+import {
+  addPackage,
+  deletePackage,
+  editPackage,
+  getPackage,
+} from "../../asyncActions";
 import FormAddPackage from "../../components/FormAddPackage";
 import PackageItem from "../../components/PackageItem";
 import { toast, ToastContainer } from "react-toastify";
@@ -33,10 +38,12 @@ function Package(props) {
   const [modalAddShow, setModalAddShow] = React.useState(false);
   const [modalEditShow, setModalEditShow] = React.useState(false);
   const [packageEdit, setPackageEdit] = React.useState({});
-  
-  const onAddPackage = async (values, { setErrors, resetForm }) => {
-    const data = { ...values, Price: values.floatPrice };
 
+  const onAddPackage = async (values, { setErrors, resetForm }) => {
+    const data = {
+      ...values,
+      Price: values.floatPrice
+    };
     try {
       const result = await dispatch(addPackage(data));
       const resultUn = unwrapResult(result);
@@ -52,8 +59,8 @@ function Package(props) {
   };
 
   const onEditPackage = async (values, { setErrors, resetForm }) => {
-    
-    const data = { ...values, Price: values.floatPrice };
+    const data = { ...values, Price: values.floatPrice || values.Price };
+
     try {
       const result = await dispatch(editPackage(data));
       const resultUn = unwrapResult(result);
@@ -70,7 +77,7 @@ function Package(props) {
   const onEdit = (item) => {
     setPackageEdit(item);
     setModalEditShow(true);
-  }
+  };
 
   const onDelete = (item) => {
     Swal.fire({
@@ -141,10 +148,7 @@ function Package(props) {
                   </Link>
                 </li>
                 <li className="breadcrumb-item text-muted">
-                  <Link
-                    to={`${PATH.CONFIGURATION}`}
-                    className="text-muted"
-                  >
+                  <Link to={`${PATH.CONFIGURATION}`} className="text-muted">
                     Cấu hình
                   </Link>
                 </li>

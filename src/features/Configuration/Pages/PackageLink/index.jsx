@@ -31,7 +31,7 @@ function PackageLink(props) {
       const resultP = await dispatch(getPackage());
       const resultPUn = unwrapResult(resultP);
       const currentPackage = resultPUn.find(
-        (item) => item.Id === match.params.Id
+        (item) => item.Id === parseInt(match.params.Id)
       );
 
       const arrayLink = resultUn.map((item) => {
@@ -118,10 +118,9 @@ function PackageLink(props) {
     setIsLoading(true);
     const Links = linkCurren.filter((item) => item.isCheck === true);
     const itemPackage = {
-      Id: currentPackage.Id,
+      ...currentPackage,
       Links: Links,
     };
-
     try {
       const result = await dispatch(editPackage(itemPackage));
       const resultUn = unwrapResult(result);
@@ -135,10 +134,6 @@ function PackageLink(props) {
       setIsLoading(false);
       handelErrorApiSwal(error);
     }
-  };
-
-  const handleStatus = (status) => {
-    console.log(status);
   };
 
   return (
@@ -212,108 +207,6 @@ function PackageLink(props) {
                   </h3>
                 </div>
                 <div className="card-toolbar">
-                  {/*begin::Dropdown*/}
-                  <div
-                    className="dropdown dropdown-inline"
-                    data-toggle="tooltip"
-                    title
-                    data-placement="top"
-                    data-original-title="Lọc theo trạng thái"
-                  >
-                    <button
-                      type="button"
-                      className="btn btn-light font-weight-bolder"
-                      data-toggle="dropdown"
-                      aria-haspopup="true"
-                      aria-expanded="false"
-                    >
-                      <span className="svg-icon svg-icon-md">
-                        {/*begin::Svg Icon | path:/var/www/preview.keenthemes.com/keen/releases/2021-03-15-144509/theme/demo1/dist/../src/media/svg/icons/Code/Compiling.svg*/}
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          xmlnsXlink="http://www.w3.org/1999/xlink"
-                          width="24px"
-                          height="24px"
-                          viewBox="0 0 24 24"
-                          version="1.1"
-                        >
-                          <g
-                            stroke="none"
-                            strokeWidth={1}
-                            fill="none"
-                            fillRule="evenodd"
-                          >
-                            <rect x={0} y={0} width={24} height={24} />
-                            <path
-                              d="M2.56066017,10.6819805 L4.68198052,8.56066017 C5.26776695,7.97487373 6.21751442,7.97487373 6.80330086,8.56066017 L8.9246212,10.6819805 C9.51040764,11.267767 9.51040764,12.2175144 8.9246212,12.8033009 L6.80330086,14.9246212 C6.21751442,15.5104076 5.26776695,15.5104076 4.68198052,14.9246212 L2.56066017,12.8033009 C1.97487373,12.2175144 1.97487373,11.267767 2.56066017,10.6819805 Z M14.5606602,10.6819805 L16.6819805,8.56066017 C17.267767,7.97487373 18.2175144,7.97487373 18.8033009,8.56066017 L20.9246212,10.6819805 C21.5104076,11.267767 21.5104076,12.2175144 20.9246212,12.8033009 L18.8033009,14.9246212 C18.2175144,15.5104076 17.267767,15.5104076 16.6819805,14.9246212 L14.5606602,12.8033009 C13.9748737,12.2175144 13.9748737,11.267767 14.5606602,10.6819805 Z"
-                              fill="#000000"
-                              opacity="0.3"
-                            />
-                            <path
-                              d="M8.56066017,16.6819805 L10.6819805,14.5606602 C11.267767,13.9748737 12.2175144,13.9748737 12.8033009,14.5606602 L14.9246212,16.6819805 C15.5104076,17.267767 15.5104076,18.2175144 14.9246212,18.8033009 L12.8033009,20.9246212 C12.2175144,21.5104076 11.267767,21.5104076 10.6819805,20.9246212 L8.56066017,18.8033009 C7.97487373,18.2175144 7.97487373,17.267767 8.56066017,16.6819805 Z M8.56066017,4.68198052 L10.6819805,2.56066017 C11.267767,1.97487373 12.2175144,1.97487373 12.8033009,2.56066017 L14.9246212,4.68198052 C15.5104076,5.26776695 15.5104076,6.21751442 14.9246212,6.80330086 L12.8033009,8.9246212 C12.2175144,9.51040764 11.267767,9.51040764 10.6819805,8.9246212 L8.56066017,6.80330086 C7.97487373,6.21751442 7.97487373,5.26776695 8.56066017,4.68198052 Z"
-                              fill="#000000"
-                            />
-                          </g>
-                        </svg>
-                        {/*end::Svg Icon*/}
-                      </span>
-                      Trạng thái
-                    </button>
-                    <div className="dropdown-menu dropdown-menu-sm dropdown-menu-right p-0 m-0">
-                      {/*begin::Navigation*/}
-                      <ul className="navi navi-hover">
-                        <li className="navi-header font-weight-bold py-4">
-                          <span className="font-size-lg">Chọn trạng thái</span>
-                          <i
-                            className="flaticon2-information icon-md text-muted"
-                            data-toggle="tooltip"
-                            data-placement="right"
-                            title
-                            data-original-title="Click to learn more..."
-                          />
-                        </li>
-                        <li className="navi-separator mb-3 opacity-70" />
-                        <li
-                          className="navi-item"
-                          onClick={() => handleStatus("ALL")}
-                        >
-                          <div className="navi-link cursor-pointer">
-                            <span className="navi-text">
-                              <span className="label label-xl label-inline label-light-primary">
-                                Tất cả
-                              </span>
-                            </span>
-                          </div>
-                        </li>
-                        <li
-                          className="navi-item"
-                          onClick={() => handleStatus("false")}
-                        >
-                          <div className="navi-link cursor-pointer">
-                            <span className="navi-text">
-                              <span className="label label-xl label-inline label-light-danger">
-                                Chưa chọn
-                              </span>
-                            </span>
-                          </div>
-                        </li>
-                        <li
-                          className="navi-item"
-                          onClick={() => handleStatus("true")}
-                        >
-                          <div className="navi-link cursor-pointer">
-                            <span className="navi-text">
-                              <span className="label label-xl label-inline label-light-success">
-                                Đã chọn
-                              </span>
-                            </span>
-                          </div>
-                        </li>
-                        <li className="mb-3 opacity-70" />
-                      </ul>
-                      {/*end::Navigation*/}
-                    </div>
-                  </div>
                   {/*end::Dropdown*/}
                   {/*begin::Dropdown*/}
                   <div className="dropdown dropdown-inline mr-2"></div>

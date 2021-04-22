@@ -81,6 +81,21 @@ function PackageItem(props) {
               ? `${packageItem.Options.length} Option được cấu hình`
               : `Option chưa cấu hình`}
           </li>
+          <li>
+            {packageItem.NumOfMembers
+              ? `${packageItem.NumOfMembers} tổng Members`
+              : `Không giới hạn Members`}
+          </li>
+          <li>
+            {packageItem.NumOfUsers
+              ? `${packageItem.NumOfUsers} tổng Users`
+              : `Không giới hạn Users`}
+          </li>
+          <li>
+            {packageItem.NumOfLocations
+              ? `${packageItem.NumOfLocations} tổng Chi nhánh`
+              : `Không giới hạn Chi nhánh`}
+          </li>
         </ul>
         <div className="btn-group dropup">
           <button
@@ -135,7 +150,12 @@ function PackageItem(props) {
                 </a>
               </li>
               <li className="navi-item">
-                <a href="#" className="navi-link">
+                <Link
+                  to={{
+                    pathname: `${PATH.CONFIGURATION}/quan-ly-goi/${packageItem.Id}/option`,
+                  }}
+                  className="navi-link"
+                >
                   <span className="navi-icon">
                     <i className="flaticon2-layers-1" />
                   </span>
@@ -147,7 +167,7 @@ function PackageItem(props) {
                       </span>
                     </span>
                   )}
-                </a>
+                </Link>
               </li>
               <li className="navi-item">
                 <Link

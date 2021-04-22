@@ -17,6 +17,8 @@ FieldInputPrice.defaultProps = {
   label: "",
 };
 
+
+
 function FieldInputPrice(props) {
   const { field, form, label, desc, placeholder } = props;
   const { name } = field;
@@ -37,6 +39,7 @@ function FieldInputPrice(props) {
             target: { name: "floatPrice", value: values.floatValue },
           });
         }}
+        defaultValue={form.initialValues.Price}
       />
       {showError ? (
         <div className="fv-plugins-message-container">
